@@ -339,7 +339,7 @@ int i = 0;
             printf("FPS: %.1f\n", fps);
         }
         
-        // TEST: print substring 
+        // TEST: print substring
         
         NSString *str2 = @"Hallo Mirjam de Pirjam heb je lekker Verkleedfeest gevierd?";
         //NSString *str3 = str2;//[str2 substringToIndex:(i)];

@@ -67,7 +67,7 @@
 - (void)pinchGestureWasRecognized:(UIPinchGestureRecognizer *)sender
 {
     CGFloat targetScale = self.renderer.textScale * sender.scale;
-    targetScale = fmax(0.5, fmin(targetScale, 15)); // RG: 15 bepaalt max zoom
+    targetScale = fmax(0.5, fmin(targetScale, 5)); // RG: 15 bepaalt max zoom
     self.renderer.textScale = targetScale;
     sender.scale = 1;
 }
