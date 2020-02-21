@@ -54,6 +54,6 @@ fragment half4 fragment_shade(TransformedVertex vert [[stage_in]],
     float insideness = smoothstep(edgeDistance - edgeWidth, edgeDistance + edgeWidth, sampleDistance);
     
     // RG: set insideness to 1.0 and render wireframes to clearly see the font quads
-    //return half4(color.r, color.g, color.b, insideness);
-    return half4(color.r, color.g, color.b, 1.0);
+    return half4(color.r, color.g, color.b, insideness);
+    //return half4(color.r, color.g, color.b, 1.0);
 }

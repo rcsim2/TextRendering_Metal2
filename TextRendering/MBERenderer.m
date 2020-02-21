@@ -33,6 +33,9 @@ static float MBEFontAtlasSize = 2048;
 
 
 
+
+
+
 @interface MBERenderer ()
 @property (nonatomic, strong) CAMetalLayer *layer;
 // Long-lived Metal objects
@@ -64,6 +67,8 @@ NSTimeInterval start_time = 0;
 
 NSString *str3 = @"";
 int i = 0;
+
+id <MTLTexture> _colorMap;
 
 
 
@@ -98,6 +103,34 @@ int i = 0;
         //[self _loadAssets];
         [self buildMetal];
         [self buildResources];
+        
+        _textScale = 1.0;
+        _textTranslation = CGPointMake(0, 0);
+        
+        
+        ///////////////////////
+        // TEST: texture
+        NSError *error;
+        
+        MTKTextureLoader* textureLoader = [[MTKTextureLoader alloc] initWithDevice:_device];
+
+        NSDictionary *textureLoaderOptions =
+        @{
+          MTKTextureLoaderOptionTextureUsage       : @(MTLTextureUsageShaderRead & MTLTextureUsageRenderTarget),
+          MTKTextureLoaderOptionTextureStorageMode : @(MTLStorageModePrivate)
+          };
+
+        _colorMap = [textureLoader newTextureWithName:@"ColorMap"
+                                          scaleFactor:1.0
+                                               bundle:nil
+                                              options:textureLoaderOptions
+                                                error:&error];
+
+        if(!_colorMap || error)
+        {
+            NSLog(@"Error creating texture %@", error.localizedDescription);
+        }
+        /////////////////////////
     }
 
     return self;
@@ -128,7 +161,7 @@ int i = 0;
     MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
 
     // TEST:
-    pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+    pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB;//MTLPixelFormatBGRA8Unorm;
     pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
     pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
     pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
@@ -335,6 +368,38 @@ int i = 0;
     // Yess!!
     // Were in the loop
     
+    
+    // Boilerplate
+//    /// Per frame updates here
+//
+//    dispatch_semaphore_wait(_inFlightSemaphore, DISPATCH_TIME_FOREVER);
+//
+//    id <MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+//    commandBuffer.label = @"MyCommand";
+//
+//    __block dispatch_semaphore_t block_sema = _inFlightSemaphore;
+//    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+//     {
+//         dispatch_semaphore_signal(block_sema);
+//     }];
+//
+//    [self _updateDynamicBufferState];
+//
+//    [self _updateGameState];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //id<CAMetalDrawable> drawable = [self.layer nextDrawable];
 
     //if (drawable)
@@ -364,7 +429,9 @@ int i = 0;
         // Done. Looks good now: we have black output so it looks like we are loading the font atlas texture
         // Commenting out gives us white. All as expected.
         // But there is probably somthing wrong with our view or model matrix.
-        renderPass.colorAttachments[0].texture = _fontTexture; // _fontTexture is the font atlas
+        // TEST: with colorMap texture
+        // Mmm, don't get any texture, only black.
+        renderPass.colorAttachments[0].texture = _colorMap;//_fontTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
