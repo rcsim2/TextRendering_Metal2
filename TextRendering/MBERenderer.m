@@ -129,18 +129,24 @@ int i = 0;
 
     // TEST:
     pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-//    pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
-//    pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-//    pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-//    pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-//    pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
-//    pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-//    pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+    pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
+    pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+    pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+    pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+    pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+    pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+    pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
 
-    // TEST: We crashed here with MTLPixelFormatDepth32Float because:
-    // failed assertion `For depth attachment, the renderPipelineState pixelFormat must be MTLPixelFormatInvalid, as no texture is set.'
+    // CRASH:
+    // TEST: We crashed with MTLPixelFormatDepth32Float because:
+    // failed assertion `For depth attachment, the renderPipelineState pixelFormat must be
+    // MTLPixelFormatInvalid, as no texture is set.'
     // Using MTLPixelFormatInvalid makes the app run but without font texture, of course.
-    pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatInvalid;//MTLPixelFormatDepth32Float;
+    // But we also see no quads. Why?
+    // OK, we managed to build a texture with [self buildDepthTexture:view]; and now can use
+    // MTLPixelFormatDepth32Float but we still see no text or quads. Why?
+    pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+    
     
     pipelineDescriptor.vertexFunction = [library newFunctionWithName:@"vertex_shade"];
     pipelineDescriptor.fragmentFunction = [library newFunctionWithName:@"fragment_shade"];
@@ -193,6 +199,11 @@ int i = 0;
     [self buildUniformBuffer];
 }
 
+
+
+
+
+
 - (void)buildFontAtlas
 {
     NSURL *fontURL = [[self.documentsURL URLByAppendingPathComponent:MBEFontName] URLByAppendingPathExtension:@"sdff"];
@@ -209,18 +220,27 @@ int i = 0;
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path];
     }
 
-    MTLTextureDescriptor *textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatR8Unorm
+    MTLTextureDescriptor *textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                                                                            width:MBEFontAtlasSize
                                                                                           height:MBEFontAtlasSize
                                                                                        mipmapped:NO];
     MTLRegion region = MTLRegionMake2D(0, 0, MBEFontAtlasSize, MBEFontAtlasSize);
+    
+    // TODO: We need MTLTextureUsageRenderTarget for _fontTexture
+    //textureDesc.usage = MTLTextureUsageRenderTarget;
+    textureDesc.usage = MTLTextureUsageRenderTarget & MTLTextureUsageShaderRead;
+    
     _fontTexture = [_device newTextureWithDescriptor:textureDesc];
     [_fontTexture setLabel:@"Font Atlas"];
-    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
+    //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
 }
 
 
 
+
+
+
+// Added text argument so we can call it dynamically
 - (void)buildTextMesh:(NSString*)text
 {
     CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 100); // RG: text x,y from top left
@@ -243,9 +263,11 @@ int i = 0;
 
 
 
-- (void)buildDepthTexture
+- (void)buildDepthTexture:(MTKView *)view
 {
-    CGSize drawableSize = self.layer.drawableSize;
+    //CGSize drawableSize = self.layer.drawableSize;
+    CGSize drawableSize = view.drawableSize;
+    
     MTLTextureDescriptor *descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
                                                                                           width:drawableSize.width
                                                                                          height:drawableSize.height
@@ -253,12 +275,14 @@ int i = 0;
     // RG: this was what we needed to get this sample running on macOS
     // Build succeeded but then we got runtime errors because these were not set
     descriptor.storageMode = MTLStorageModePrivate;
-    descriptor.usage = MTLTextureUsageRenderTarget;
+    descriptor.usage = MTLTextureUsageRenderTarget;// & MTLTextureUsageShaderRead;
     
     
     self.depthTexture = [self.device newTextureWithDescriptor:descriptor];
     [self.depthTexture setLabel:@"Depth Texture"];
 }
+
+
 
 
 - (MTLRenderPassDescriptor *)newRenderPassWithColorAttachmentTexture:(id<MTLTexture>)texture
@@ -278,9 +302,14 @@ int i = 0;
     return renderPass;
 }
 
-- (void)updateUniforms
+
+
+
+
+- (void)updateUniforms:(MTKView *)view
 {
-    CGSize drawableSize = self.layer.drawableSize;
+    //CGSize drawableSize = self.layer.drawableSize;
+    CGSize drawableSize = view.drawableSize;
 
     MBEUniforms uniforms;
 
@@ -310,28 +339,40 @@ int i = 0;
 
     //if (drawable)
     {
-        CGSize drawableSize = self.layer.drawableSize;
+        
+//        CGSize drawableSize = self.layer.drawableSize;
+//
+//        if ([self.depthTexture width] != drawableSize.width || [self.depthTexture height] != drawableSize.height)
+//        {
+            //[self buildDepthTexture:view];
+            [self buildDepthTexture:view];
+//        }
+        
+        // [self updateUniforms];
+        [self updateUniforms:view];
+        
 
-        if ([self.depthTexture width] != drawableSize.width || [self.depthTexture height] != drawableSize.height)
-        {
-            [self buildDepthTexture];
-        }
-
-        [self updateUniforms];
-
-        // TODO: we need renderpass descriptor with a texture attached????
+        /////////////////////////////////////////////////////////
+        // TODO: we need renderpass descriptor with a texture attached
+        // DONE: Well, we have that now. But now we get: failed assertion `PixelFormat
+        // MTLPixelFormatDepth32Float is not color renderable'
+        //
         //MTLRenderPassDescriptor *renderPass = [self newRenderPassWithColorAttachmentTexture:[drawable texture]];
         MTLRenderPassDescriptor* renderPass = view.currentRenderPassDescriptor;
         
-        //renderPass.colorAttachments[0].texture = texture;
+        // Mmm: failed assertion `Texture at colorAttachment[0] has usage (0x01) which doesn't specify MTLTextureUsageRenderTarget (0x04)'
+        renderPass.colorAttachments[0].texture = _fontTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
 
-        renderPass.depthAttachment.texture = self.depthTexture;
+        renderPass.depthAttachment.texture = self.depthTexture; // the depth texture
         renderPass.depthAttachment.loadAction = MTLLoadActionClear;
         renderPass.depthAttachment.storeAction = MTLStoreActionStore;
         renderPass.depthAttachment.clearDepth = 1.0;
+        /////////////////////////////////////////////////////////
+        
+        
         
         
         if(renderPass != nil) {
@@ -360,8 +401,8 @@ int i = 0;
             // NOTE: wireframes draw ugly: the lines are vague and we have 4 quads per cube side
             // What's going on?
             // This: MDLMesh newBoxWithDimensions segments 2
-            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeFill];
-            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines];
+            [commandEncoder setTriangleFillMode: MTLTriangleFillModeFill]; // default
+            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines]; // wireframe
             
             
             // TEST: can we dynamically draw text? Yes!
@@ -444,6 +485,11 @@ int i = 0;
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
 
     /// Respond to drawable size or orientation changes here
+
+    //float aspect = size.width / (float)size.height;
+    //_projectionMatrix = matrix_perspective_right_hand(65.0f * (M_PI / 180.0f), aspect, 0.1f, 100.0f);
+    
+    //[self updateUniforms:view];
 }
 
 

@@ -24,13 +24,14 @@
 {
     [super setFrame:frame];
     
+    // TEST: scale hardcoded to 2 as we get in Mac Catalyst app
     // During the first layout pass, we will not be in a view hierarchy, so we guess our scale
-    CGFloat scale = 10.0;//[NSScreen mainScreen].scale;
+    CGFloat scale = 2;//10.0;//[NSScreen mainScreen].scale;
     
     // If we've moved to a window by the time our frame is being set, we can take its scale as our own
     if (self.window)
     {
-        scale = 10.0;//self.window.screen.scale;
+        scale = 2;//10.0;//self.window.screen.scale;
     }
     
     CGSize drawableSize = self.bounds.size;
