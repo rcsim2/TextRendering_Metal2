@@ -10,6 +10,10 @@
 #import "MBETypes.h"
 @import CoreText;
 
+#import <Cocoa/Cocoa.h>
+
+
+
 typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
                                                  NSInteger glyphIndex,
                                                  CGRect glyphBounds);
@@ -32,13 +36,16 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
     return self;
 }
 
+
+
+
 - (void)buildMeshWithString:(NSString *)string
                      inRect:(CGRect)rect
                    withFont:(MBEFontAtlas *)fontAtlas
                      atSize:(CGFloat)fontSize
                      device:(id<MTLDevice>)device
 {
-    UIFont *font = [fontAtlas.parentFont fontWithSize:fontSize];
+    NSFont *font = [NSFont fontWithName:@"Times" size:23];
     NSDictionary *attributes = @{ NSFontAttributeName : font };
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
     CFRange stringRange = CFRangeMake(0, attrString.length);
@@ -119,8 +126,12 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
 
     __block CFIndex glyphIndexInFrame = 0;
 
-    UIGraphicsBeginImageContext(CGSizeMake(1, 1));
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    //UIGraphicsBeginImageContext(CGSizeMake(1, 1));
+    
+    //CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextRef context =  CGBitmapContextCreate(0, 4096, 4096, 8, 4096*4, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
+
+    
 
     [lines enumerateObjectsUsingBlock:^(id lineObject, NSUInteger lineIndex, BOOL *stop) {
         CTLineRef line = (__bridge CTLineRef)lineObject;
@@ -157,7 +168,7 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
         }];
     }];
     
-    UIGraphicsEndImageContext();
+    //UIGraphicsEndImageContext();
 }
 
 @end

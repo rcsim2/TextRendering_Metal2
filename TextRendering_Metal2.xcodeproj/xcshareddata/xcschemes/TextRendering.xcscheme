@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "83D6DE981A853166003E9203"
-               BuildableName = "TextRendering.app"
-               BlueprintName = "TextRendering"
-               ReferencedContainer = "container:TextRendering.xcodeproj">
+               BuildableName = "TextRendering_Metal2.app"
+               BlueprintName = "TextRendering_Metal2"
+               ReferencedContainer = "container:TextRendering_Metal2.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "83D6DE981A853166003E9203"
-            BuildableName = "TextRendering.app"
-            BlueprintName = "TextRendering"
-            ReferencedContainer = "container:TextRendering.xcodeproj">
+            BuildableName = "TextRendering_Metal2.app"
+            BlueprintName = "TextRendering_Metal2"
+            ReferencedContainer = "container:TextRendering_Metal2.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "83D6DE981A853166003E9203"
-            BuildableName = "TextRendering.app"
-            BlueprintName = "TextRendering"
-            ReferencedContainer = "container:TextRendering.xcodeproj">
+            BuildableName = "TextRendering_Metal2.app"
+            BlueprintName = "TextRendering_Metal2"
+            ReferencedContainer = "container:TextRendering_Metal2.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

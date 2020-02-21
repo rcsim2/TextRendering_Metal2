@@ -12,14 +12,13 @@
 		83D6DE9F1A853166003E9203 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DE9E1A853166003E9203 /* main.m */; };
 		83D6DEA21A853166003E9203 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DEA11A853166003E9203 /* AppDelegate.m */; };
 		83D6DEA51A853166003E9203 /* MBEViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DEA41A853166003E9203 /* MBEViewController.m */; };
-		83D6DEA81A853166003E9203 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83D6DEA61A853166003E9203 /* Main.storyboard */; };
 		83D6DEAA1A853166003E9203 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83D6DEA91A853166003E9203 /* Images.xcassets */; };
-		83D6DEAD1A853166003E9203 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D6DEAB1A853166003E9203 /* LaunchScreen.xib */; };
 		83D6DEC81A853291003E9203 /* MBEMathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DEC31A853291003E9203 /* MBEMathUtilities.m */; };
 		83D6DEC91A853291003E9203 /* MBEMetalView.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DEC51A853291003E9203 /* MBEMetalView.m */; };
 		83D6DECA1A853291003E9203 /* MBERenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DEC71A853291003E9203 /* MBERenderer.m */; };
 		83D6DECD1A853689003E9203 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DECC1A853689003E9203 /* Shaders.metal */; };
 		83D6DED01A854244003E9203 /* MBEFontAtlas.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DECF1A854244003E9203 /* MBEFontAtlas.m */; };
+		D1446BE223FF4CAB003820B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1446BE123FF4CAB003820B5 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,16 +26,14 @@
 		833505F91A898E54009FD917 /* MBEMesh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBEMesh.m; sourceTree = "<group>"; };
 		833505FB1A89970A009FD917 /* MBETextMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBETextMesh.h; sourceTree = "<group>"; };
 		833505FC1A89970A009FD917 /* MBETextMesh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBETextMesh.m; sourceTree = "<group>"; };
-		83D6DE991A853166003E9203 /* TextRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TextRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83D6DE991A853166003E9203 /* TextRendering_Metal2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TextRendering_Metal2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83D6DE9D1A853166003E9203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83D6DE9E1A853166003E9203 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		83D6DEA01A853166003E9203 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		83D6DEA11A853166003E9203 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		83D6DEA31A853166003E9203 /* MBEViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBEViewController.h; sourceTree = "<group>"; };
 		83D6DEA41A853166003E9203 /* MBEViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBEViewController.m; sourceTree = "<group>"; };
-		83D6DEA71A853166003E9203 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		83D6DEA91A853166003E9203 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		83D6DEAC1A853166003E9203 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		83D6DEC21A853291003E9203 /* MBEMathUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBEMathUtilities.h; sourceTree = "<group>"; };
 		83D6DEC31A853291003E9203 /* MBEMathUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBEMathUtilities.m; sourceTree = "<group>"; };
 		83D6DEC41A853291003E9203 /* MBEMetalView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBEMetalView.h; sourceTree = "<group>"; };
@@ -48,6 +45,8 @@
 		83D6DECE1A854244003E9203 /* MBEFontAtlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBEFontAtlas.h; sourceTree = "<group>"; };
 		83D6DECF1A854244003E9203 /* MBEFontAtlas.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBEFontAtlas.m; sourceTree = "<group>"; };
 		D1446BD023FD228B003820B5 /* TextRendering.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TextRendering.entitlements; sourceTree = "<group>"; };
+		D1446BD523FF13F2003820B5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
+		D1446BE123FF4CAB003820B5 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,13 +65,14 @@
 			children = (
 				83D6DE9B1A853166003E9203 /* TextRendering */,
 				83D6DE9A1A853166003E9203 /* Products */,
+				D1446BD423FF13F2003820B5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		83D6DE9A1A853166003E9203 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				83D6DE991A853166003E9203 /* TextRendering.app */,
+				83D6DE991A853166003E9203 /* TextRendering_Metal2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,9 +99,8 @@
 				83D6DEA01A853166003E9203 /* AppDelegate.h */,
 				83D6DEA11A853166003E9203 /* AppDelegate.m */,
 				83D6DECC1A853689003E9203 /* Shaders.metal */,
-				83D6DEA61A853166003E9203 /* Main.storyboard */,
-				83D6DEAB1A853166003E9203 /* LaunchScreen.xib */,
 				83D6DEA91A853166003E9203 /* Images.xcassets */,
+				D1446BE123FF4CAB003820B5 /* Main.storyboard */,
 				83D6DE9C1A853166003E9203 /* Supporting Files */,
 			);
 			path = TextRendering;
@@ -116,12 +115,20 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		D1446BD423FF13F2003820B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D1446BD523FF13F2003820B5 /* AppKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		83D6DE981A853166003E9203 /* TextRendering */ = {
+		83D6DE981A853166003E9203 /* TextRendering_Metal2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83D6DEBC1A853166003E9203 /* Build configuration list for PBXNativeTarget "TextRendering" */;
+			buildConfigurationList = 83D6DEBC1A853166003E9203 /* Build configuration list for PBXNativeTarget "TextRendering_Metal2" */;
 			buildPhases = (
 				83D6DE951A853166003E9203 /* Sources */,
 				83D6DE961A853166003E9203 /* Frameworks */,
@@ -131,9 +138,9 @@
 			);
 			dependencies = (
 			);
-			name = TextRendering;
+			name = TextRendering_Metal2;
 			productName = TextRendering;
-			productReference = 83D6DE991A853166003E9203 /* TextRendering.app */;
+			productReference = 83D6DE991A853166003E9203 /* TextRendering_Metal2.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -151,7 +158,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83D6DE941A853166003E9203 /* Build configuration list for PBXProject "TextRendering" */;
+			buildConfigurationList = 83D6DE941A853166003E9203 /* Build configuration list for PBXProject "TextRendering_Metal2" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -164,7 +171,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83D6DE981A853166003E9203 /* TextRendering */,
+				83D6DE981A853166003E9203 /* TextRendering_Metal2 */,
 			);
 		};
 /* End PBXProject section */
@@ -174,9 +181,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83D6DEA81A853166003E9203 /* Main.storyboard in Resources */,
-				83D6DEAD1A853166003E9203 /* LaunchScreen.xib in Resources */,
 				83D6DEAA1A853166003E9203 /* Images.xcassets in Resources */,
+				D1446BE223FF4CAB003820B5 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,25 +207,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		83D6DEA61A853166003E9203 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				83D6DEA71A853166003E9203 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		83D6DEAB1A853166003E9203 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				83D6DEAC1A853166003E9203 /* Base */,
-			);
-			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		83D6DEBA1A853166003E9203 /* Debug */ = {
@@ -335,7 +322,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.metalbyexample.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -351,14 +340,16 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.metalbyexample.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		83D6DE941A853166003E9203 /* Build configuration list for PBXProject "TextRendering" */ = {
+		83D6DE941A853166003E9203 /* Build configuration list for PBXProject "TextRendering_Metal2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83D6DEBA1A853166003E9203 /* Debug */,
@@ -367,7 +358,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83D6DEBC1A853166003E9203 /* Build configuration list for PBXNativeTarget "TextRendering" */ = {
+		83D6DEBC1A853166003E9203 /* Build configuration list for PBXNativeTarget "TextRendering_Metal2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83D6DEBD1A853166003E9203 /* Debug */,

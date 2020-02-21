@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Metal By Example. All rights reserved.
 //
 
-@import UIKit;
+//@import UIKit;
 @import Metal;
 
 @interface MBEMesh : NSObject

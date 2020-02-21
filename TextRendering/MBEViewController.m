@@ -10,35 +10,125 @@
 #import "MBEMetalView.h"
 #import "MBERenderer.h"
 
-@interface MBEViewController () <UIGestureRecognizerDelegate>
+@interface MBEViewController () //<UIGestureRecognizerDelegate>
 @property (nonatomic, strong) MBERenderer *renderer;
-@property (nonatomic, strong) CADisplayLink *displayLink;
+//@property (nonatomic, strong) CADisplayLink *displayLink;
+@property (nonatomic) CVDisplayLinkRef displayLink;
+//@property (nonatomic) MTLCommandBuffer commandQueue;
+
 @end
 
+
+
 @implementation MBEViewController
+
+// Vars
+MBEMetalView *_view;
+
+//Renderer *_renderer;
+
 
 - (MBEMetalView *)metalView
 {
     return (MBEMetalView *)self.view;
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    
+    _view = (MBEMetalView *)self.view;
+    
+    _view.device = MTLCreateSystemDefaultDevice();
+    
+    if(!_view.device)
+    {
+        NSLog(@"Metal is not supported on this device");
+        self.view = [[NSView alloc] initWithFrame:self.view.frame];
+        return;
+    }
+    
+    self.renderer = [[MBERenderer alloc] initWithMetalKitView:_view];
+    
+    [_renderer mtkView:_view drawableSizeWillChange:_view.bounds.size];
 
-    self.renderer = [[MBERenderer alloc] initWithLayer:self.metalView.metalLayer];
+    _view.delegate = _renderer;
+    
+    
 
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayLinkDidFire:)];
-    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    //self.renderer = [[MBERenderer alloc] initWithLayer:self.metalView.metalLayer];
 
-    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
-                                                                                           action:@selector(panGestureWasRecognized:)];
-    panGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:panGestureRecognizer];
+    // TODO: port this to macOS: displayLinkDidFire -> redraw -> renderer.draw
+    //self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayLinkDidFire:)];
+    //[self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    
+    
+        
+//    CGDirectDisplayID   displayID = CGMainDisplayID();
+//    CVReturn            error = kCVReturnSuccess;
+//    error = CVDisplayLinkCreateWithCGDisplay(displayID, _displayLink);
+//    if (error)
+//    {
+//        NSLog(@"DisplayLink created with error:%d", error);
+//        _displayLink = NULL;
+//    }
+//    CVDisplayLinkSetOutputCallback(_displayLink, renderCallback, (__bridge void *)self);
+    
+    
+//    CVDisplayLinkCreateWithActiveCGDisplays(&_displayLink);
+//    CVDisplayLinkSetOutputCallback(_displayLink, &MyDisplayLinkCallback, (__bridge void * _Nullable)(self));
+//    CVDisplayLinkStart(_displayLink);
+    
+    
+    //  We moeten nu MetalView koppelen aan de Renderer maar het originele project was voor iOS en
+    // gebruikte de oude CAMetalLayer methode (ipv MTKView). De renderer daar heeft:
+    //
+    // - (instancetype)initWithLayer:(CAMetalLayer *)layer;
+    // - (void)draw;
+    //
+    // Hoe kunnen we draw nu aanduiden als de gameloop methode? CADisplayLink werkt niet op macOS.
+    // Vraag is of we op die manier de boel kunnen koppelen of toch moeten ombouwen naar de MTKView methode
+    // met een delegate.
+    // Zo wordt het gedaan met MTKView:
+    
+//    //////////////
+//    _view = (MBEMetalView *)self.view;
+//
+//    _view.device = MTLCreateSystemDefaultDevice();
+//
+//    if(!_view.device)
+//    {
+//        NSLog(@"Metal is not supported on this device");
+//        self.view = [[NSView alloc] initWithFrame:self.view.frame];
+//        return;
+//    }
+//
+//    //_renderer = [[MBERenderer alloc] initWithMetalKitView:_view];
+      // NOTE: Need  <MTKViewDelegate> in MBERenderer
+    //self.renderer = [[MBERenderer alloc] initWithMetalKitView:_view];
+//
+//    //[_renderer mtkView:_view drawableSizeWillChange:_view.bounds.size];
+//
+//    //_view.delegate = _renderer;
+//    ////////////////
+    
+    
+    
+    
+    
 
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self
-                                                                                                 action:@selector(pinchGestureWasRecognized:)];
-    pinchGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:pinchGestureRecognizer];
+    
+
+//    //UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
+//                                                                                           action:@selector(panGestureWasRecognized:)];
+//    //panGestureRecognizer.delegate = self;
+//    //[self.view addGestureRecognizer:panGestureRecognizer];
+//
+//    //UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self
+//                                                                                                 action:@selector(pinchGestureWasRecognized:)];
+//    //pinchGestureRecognizer.delegate = self;
+//    //[self.view addGestureRecognizer:pinchGestureRecognizer];
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -46,6 +136,8 @@
     return YES;
 }
 
+
+////////
 - (void)displayLinkDidFire:(id)sender
 {
     [self redraw];
@@ -53,28 +145,82 @@
 
 - (void)redraw
 {
-    [self.renderer draw];
+    //[self.renderer draw];
 }
 
-- (void)panGestureWasRecognized:(UIPanGestureRecognizer *)sender
-{
-    CGPoint translation = self.renderer.textTranslation;
-    CGPoint deltaTranslation = [sender translationInView:self.view];
-    self.renderer.textTranslation = CGPointMake(translation.x + deltaTranslation.x, translation.y + deltaTranslation.y);
-    [sender setTranslation:CGPointZero inView:self.view];
-}
 
-- (void)pinchGestureWasRecognized:(UIPinchGestureRecognizer *)sender
-{
-    CGFloat targetScale = self.renderer.textScale * sender.scale;
-    targetScale = fmax(0.5, fmin(targetScale, 5)); // RG: 15 bepaalt max zoom
-    self.renderer.textScale = targetScale;
-    sender.scale = 1;
-}
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
-{
-    return YES;
-}
+////////
+// See: https://stackoverflow.com/questions/37794646/the-right-way-to-make-a-continuously-redrawn-metal-nsview
+////////
+//static CVReturn renderCallback(CVDisplayLinkRef displayLink,
+//                               const CVTimeStamp *inNow,
+//                               const CVTimeStamp *inOutputTime,
+//                               CVOptionFlags flagsIn,
+//                               CVOptionFlags *flagsOut,
+//                               void *displayLinkContext)
+//{
+//    return [(__bridge SPVideoView *)displayLinkContext renderTime:inOutputTime];
+//}
+
+
+//static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
+//{
+//
+//    [(__bridge MBEMetalView *)displayLinkContext setNeedsDisplay:YES];
+//    return kCVReturnSuccess;
+//}
+
+
+
+
+//- (BOOL) wantsLayer {
+//    return YES;
+//}
+//
+//- (BOOL) wantsUpdateLayer {
+//    return YES;
+//}
+//
+//- (void) displayLayer:(CALayer *)layer {
+//    //id<MTLCommandBuffer> cmdBuffer = [_commandQueue commandBuffer];
+//    //id<CAMetalDrawable> drawable = [((CAMetalLayer *) layer) nextDrawable];
+//
+//    //[cmdBuffer enqueue];
+//    //[cmdBuffer presentDrawable:drawable];
+//
+//    // rendering
+//    [self redraw];
+//
+//    //[cmdBuffer commit];
+//}
+
+
+
+
+
+
+
+
+//- (void)panGestureWasRecognized:(UIPanGestureRecognizer *)sender
+//{
+//    CGPoint translation = self.renderer.textTranslation;
+//    CGPoint deltaTranslation = [sender translationInView:self.view];
+//    self.renderer.textTranslation = CGPointMake(translation.x + deltaTranslation.x, translation.y + deltaTranslation.y);
+//    [sender setTranslation:CGPointZero inView:self.view];
+//}
+//
+//- (void)pinchGestureWasRecognized:(UIPinchGestureRecognizer *)sender
+//{
+//    CGFloat targetScale = self.renderer.textScale * sender.scale;
+//    targetScale = fmax(0.5, fmin(targetScale, 5)); // RG: 15 bepaalt max zoom
+//    self.renderer.textScale = targetScale;
+//    sender.scale = 1;
+//}
+//
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+//{
+//    return YES;
+//}
 
 @end

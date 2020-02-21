@@ -6,11 +6,14 @@
 //  Copyright (c) 2015 Metal By Example. All rights reserved.
 //
 
-@import UIKit;
+//@import UIKit;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+#import <Cocoa/Cocoa.h>
 
-@property (strong, nonatomic) UIWindow *window;
+@interface AppDelegate : NSObject <NSApplicationDelegate>
+
+@property (assign) IBOutlet NSWindow *window;
 
 @end
+
 

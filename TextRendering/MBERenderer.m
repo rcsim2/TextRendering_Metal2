@@ -14,6 +14,11 @@
 #import "MBEFontAtlas.h"
 #import "MBETextMesh.h"
 
+#import <Cocoa/Cocoa.h>
+
+
+
+
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 0
 
 static NSString *const MBEFontName = @"Arial";//@"HoeflerText-Regular";
@@ -25,6 +30,8 @@ static NSString *const MBESampleText = @"It was the best of times, it was the wo
 static vector_float4 MBETextColor = { 0.1, 0.1, 0.1, 1 };
 static MTLClearColor MBEClearColor = { 1, 1, 1, 1 };
 static float MBEFontAtlasSize = 2048;
+
+
 
 @interface MBERenderer ()
 @property (nonatomic, strong) CAMetalLayer *layer;
@@ -60,7 +67,7 @@ int i = 0;
 
 
 
-
+// Old
 - (instancetype)initWithLayer:(CAMetalLayer *)layer
 {
     if ((self = [super init]))
@@ -73,10 +80,33 @@ int i = 0;
         _textTranslation = CGPointMake(0, 0);
         
         // init
-        start = clock();
+        //start = clock();
     }
     return self;
 }
+
+
+// New
+-(nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)view;
+{
+    self = [super init];
+    if(self)
+    {
+        _device = view.device;
+        //_inFlightSemaphore = dispatch_semaphore_create(kMaxBuffersInFlight);
+        //[self _loadMetalWithView:view];
+        //[self _loadAssets];
+        [self buildMetal];
+        [self buildResources];
+    }
+
+    return self;
+}
+
+
+
+
+
 
 - (void)buildMetal
 {
@@ -98,18 +128,20 @@ int i = 0;
     MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
 
     pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-    pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
-    pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-    pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-    pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-    pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
-    pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-    pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+//    pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
+//    pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+//    pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+//    pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+//    pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+//    pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+//    pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
 
-    pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+    pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatInvalid;//MTLPixelFormatDepth32Float;
+    
     pipelineDescriptor.vertexFunction = [library newFunctionWithName:@"vertex_shade"];
     pipelineDescriptor.fragmentFunction = [library newFunctionWithName:@"fragment_shade"];
     pipelineDescriptor.vertexDescriptor = [self newVertexDescriptor];
+    
 
     NSError *error = nil;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
@@ -118,6 +150,10 @@ int i = 0;
         NSLog(@"Error occurred when compiling pipeline state: %@", error);
     }
 }
+
+
+
+
 
 - (MTLVertexDescriptor *)newVertexDescriptor
 {
@@ -164,7 +200,7 @@ int i = 0;
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
     if (!_fontAtlas)
     {
-        UIFont *font = [UIFont fontWithName:MBEFontName size:32];
+        NSFont *font = [NSFont fontWithName:MBEFontName size:32];
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path];
     }
@@ -183,7 +219,7 @@ int i = 0;
 
 - (void)buildTextMesh:(NSString*)text
 {
-    CGRect textRect = CGRectInset([UIScreen mainScreen].nativeBounds, 100, 100); // RG: text x,y from top left
+    CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 100); // RG: text x,y from top left
 
     _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//"MBESampleText
                                              inRect:textRect
@@ -260,11 +296,15 @@ int i = 0;
 
 
 
-- (void)draw
+//- (void)draw
+- (void)drawInMTKView:(nonnull MTKView *)view
 {
-    id<CAMetalDrawable> drawable = [self.layer nextDrawable];
+    // Yess!!
+    // Were in the loop
+    
+    //id<CAMetalDrawable> drawable = [self.layer nextDrawable];
 
-    if (drawable)
+    //if (drawable)
     {
         CGSize drawableSize = self.layer.drawableSize;
 
@@ -275,99 +315,132 @@ int i = 0;
 
         [self updateUniforms];
 
-        MTLRenderPassDescriptor *renderPass = [self newRenderPassWithColorAttachmentTexture:[drawable texture]];
+        // TODO: we need renderpass descriptor with a texture attached????
+        //MTLRenderPassDescriptor *renderPass = [self newRenderPassWithColorAttachmentTexture:[drawable texture]];
+        MTLRenderPassDescriptor* renderPass = view.currentRenderPassDescriptor;
+        
+        //renderPass.colorAttachments[0].texture = texture;
+        renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
+        renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
+        renderPass.colorAttachments[0].clearColor = MBEClearColor;
 
-        id<MTLCommandBuffer> commandBuffer = [self.commandQueue commandBuffer];
+        renderPass.depthAttachment.texture = self.depthTexture;
+        renderPass.depthAttachment.loadAction = MTLLoadActionClear;
+        renderPass.depthAttachment.storeAction = MTLStoreActionStore;
+        renderPass.depthAttachment.clearDepth = 1.0;
+        
+        
+        if(renderPass != nil) {
 
-        id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPass];
-        [commandEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
-        [commandEncoder setCullMode:MTLCullModeNone];
-        [commandEncoder setRenderPipelineState:self.pipelineState];
+            /// Final pass rendering code here
 
-        [commandEncoder setVertexBuffer:self.textMesh.vertexBuffer offset:0 atIndex:0];
-        [commandEncoder setVertexBuffer:self.uniformBuffer offset:0 atIndex:1];
+            id<MTLCommandBuffer> commandBuffer = [self.commandQueue commandBuffer];
 
-        [commandEncoder setFragmentBuffer:self.uniformBuffer offset:0 atIndex:0];
-        [commandEncoder setFragmentTexture:self.fontTexture atIndex:0];
-        [commandEncoder setFragmentSamplerState:self.sampler atIndex:0];
-        
-        
-        // Wireframe
-        // NOTE: wireframes draw ugly: the lines are vague and we have 4 quads per cube side
-        // What's going on?
-        // This: MDLMesh newBoxWithDimensions segments 2
-        //[commandEncoder setTriangleFillMode: MTLTriangleFillModeFill];
-        //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines];
-        
-        
-        // TEST: can we dynamically draw text? Yes!
-        frame++;
-        //[self buildTextMesh:@"QQQ"];
-        //[self buildTextMesh:@(frame).stringValue];
-        //end = clock();
-//        if ( (clock() - start)/CLOCKS_PER_SEC > 1 ) {
-//            fps = (frame - frame2);
-//
-//            frame2 = frame;
-//            start = clock();
-//        }
-        
-        
-        
-        
-        // Get FPS
-        // NOTE: we are not getting proper fps because the renderloop is timer based which fuck up clock()
-//        if (frame % 2 == 0) {
-//            //float frametime = clock() - start;
-//            clock_t delta_ticks = clock() - start;
-//            fps = CLOCKS_PER_SEC/delta_ticks;
-//        } else {
-//            start = clock();
-//        }
-        
-        
-        // Hè hè, zo krijgen we wel de juiste FPS. Het lijkt er dus inderdaad op dat Metal de clock() vertraagt
-        // om 60 FPS te krijgen, en daarom kunnen we clock() niet meer gebruiken voor real-time timers.
-        NSTimeInterval current_time = [[NSDate date] timeIntervalSince1970];
-        ++frames;
-        
-        if (current_time - start_time > 1.0)
-        {
-            fps = frames / (current_time - start_time);
-            start_time = current_time;
-            frames = 0;
+            id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPass];
+            [commandEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
+            [commandEncoder setCullMode:MTLCullModeNone];
             
-            printf("FPS: %.1f\n", fps);
+            // CRASH: because: failed assertion `For depth attachment, the renderPipelineState pixelFormat
+            // must be MTLPixelFormatInvalid, as no texture is set.'
+            [commandEncoder setRenderPipelineState:self.pipelineState];
+
+            [commandEncoder setVertexBuffer:self.textMesh.vertexBuffer offset:0 atIndex:0];
+            [commandEncoder setVertexBuffer:self.uniformBuffer offset:0 atIndex:1];
+
+            [commandEncoder setFragmentBuffer:self.uniformBuffer offset:0 atIndex:0];
+            [commandEncoder setFragmentTexture:self.fontTexture atIndex:0];
+            [commandEncoder setFragmentSamplerState:self.sampler atIndex:0];
+            
+            
+            // Wireframe
+            // NOTE: wireframes draw ugly: the lines are vague and we have 4 quads per cube side
+            // What's going on?
+            // This: MDLMesh newBoxWithDimensions segments 2
+            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeFill];
+            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines];
+            
+            
+            // TEST: can we dynamically draw text? Yes!
+            frame++;
+            //[self buildTextMesh:@"QQQ"];
+            //[self buildTextMesh:@(frame).stringValue];
+            //end = clock();
+    //        if ( (clock() - start)/CLOCKS_PER_SEC > 1 ) {
+    //            fps = (frame - frame2);
+    //
+    //            frame2 = frame;
+    //            start = clock();
+    //        }
+            
+            
+            
+            
+            // Get FPS
+            // NOTE: we are not getting proper fps because the renderloop is timer based which fuck up clock()
+    //        if (frame % 2 == 0) {
+    //            //float frametime = clock() - start;
+    //            clock_t delta_ticks = clock() - start;
+    //            fps = CLOCKS_PER_SEC/delta_ticks;
+    //        } else {
+    //            start = clock();
+    //        }
+            
+            
+            // Hè hè, zo krijgen we wel de juiste FPS. Het lijkt er dus inderdaad op dat Metal de clock() vertraagt
+            // om 60 FPS te krijgen, en daarom kunnen we clock() niet meer gebruiken voor real-time timers.
+            NSTimeInterval current_time = [[NSDate date] timeIntervalSince1970];
+            ++frames;
+            
+            if (current_time - start_time > 1.0)
+            {
+                fps = frames / (current_time - start_time);
+                start_time = current_time;
+                frames = 0;
+                
+                printf("FPS: %.1f\n", fps);
+            }
+            
+            // TEST: print substring
+            
+            NSString *str2 = @"Hallo Mirjam de Pirjam heb je lekker Verkleedfeest gevierd?";
+            //NSString *str3 = str2;//[str2 substringToIndex:(i)];
+            if (frame % 5 == 0) {
+                str3 = [str2 substringToIndex:(i++)];
+                if (i>str2.length) i=0;
+                //[[NSSound soundNamed:@"Pop"] play];
+            }
+            
+            
+            // Print FPS onscreen
+            //NSString *string1 = [NSString stringWithFormat:@"A string: %@, a float: %1.2f", @"string", 31415.9265];
+            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\n\n%@", frame, fps, str3];
+            [self buildTextMesh:str];
+            
+            
+
+            [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+                                       indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
+                                        indexType:MTLIndexTypeUInt16
+                                      indexBuffer:self.textMesh.indexBuffer
+                                indexBufferOffset:0];
+
+            [commandEncoder endEncoding];
+
+            //[commandBuffer presentDrawable:drawable];
+            [commandBuffer presentDrawable:view.currentDrawable];
+            
+            [commandBuffer commit];
+            
         }
+            
         
-        // TEST: print substring
-        
-        NSString *str2 = @"Hallo Mirjam de Pirjam heb je lekker Verkleedfeest gevierd?";
-        //NSString *str3 = str2;//[str2 substringToIndex:(i)];
-        if (frame % 5 == 0) {
-            str3 = [str2 substringToIndex:(i++)];
-            if (i>str2.length) i=0;
-        }
-        
-        
-        // Print FPS onscreen
-        //NSString *string1 = [NSString stringWithFormat:@"A string: %@, a float: %1.2f", @"string", 31415.9265];
-        NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\n\n%@", frame, fps, str3];
-        [self buildTextMesh:str];
-        
-        
-
-        [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                                   indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
-                                    indexType:MTLIndexTypeUInt16
-                                  indexBuffer:self.textMesh.indexBuffer
-                            indexBufferOffset:0];
-
-        [commandEncoder endEncoding];
-
-        [commandBuffer presentDrawable:drawable];
-        [commandBuffer commit];
     }
 }
+
+- (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
+
+    /// Respond to drawable size or orientation changes here
+}
+
 
 @end

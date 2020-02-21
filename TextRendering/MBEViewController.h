@@ -6,8 +6,14 @@
 //  Copyright (c) 2015 Metal By Example. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Cocoa/Cocoa.h>
+#import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
 
-@interface MBEViewController : UIViewController
+// Our macOS view controller.
+@interface MBEViewController : NSViewController
+
+// Pointer to the view's window
+@property (readwrite, nonatomic) NSWindow* window;
 
 @end
