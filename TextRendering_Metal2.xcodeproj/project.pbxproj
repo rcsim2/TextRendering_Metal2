@@ -19,6 +19,7 @@
 		83D6DECD1A853689003E9203 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DECC1A853689003E9203 /* Shaders.metal */; };
 		83D6DED01A854244003E9203 /* MBEFontAtlas.m in Sources */ = {isa = PBXBuildFile; fileRef = 83D6DECF1A854244003E9203 /* MBEFontAtlas.m */; };
 		D1446BE223FF4CAB003820B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1446BE123FF4CAB003820B5 /* Main.storyboard */; };
+		D1446C332400053B003820B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D1446C302400053B003820B5 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		D1446BD023FD228B003820B5 /* TextRendering.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TextRendering.entitlements; sourceTree = "<group>"; };
 		D1446BD523FF13F2003820B5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
 		D1446BE123FF4CAB003820B5 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		D1446C302400053B003820B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 		83D6DE901A853166003E9203 = {
 			isa = PBXGroup;
 			children = (
+				D1446C302400053B003820B5 /* README.md */,
 				83D6DE9B1A853166003E9203 /* TextRendering */,
 				83D6DE9A1A853166003E9203 /* Products */,
 				D1446BD423FF13F2003820B5 /* Frameworks */,
@@ -181,6 +184,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1446C332400053B003820B5 /* README.md in Resources */,
 				83D6DEAA1A853166003E9203 /* Images.xcassets in Resources */,
 				D1446BE223FF4CAB003820B5 /* Main.storyboard in Resources */,
 			);
