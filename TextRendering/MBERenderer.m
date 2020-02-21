@@ -462,7 +462,7 @@ MTKMesh *_mesh;
         // But there is probably somthing wrong with our view or model matrix.
         // TEST: with colorMap texture
         // Mmm, don't get any texture, only black.
-        //renderPass.colorAttachments[0].texture = _colorMap;//_fontTexture; // _fontTexture is the font atlas
+        //renderPass.colorAttachments[0].texture = _fontTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
@@ -503,7 +503,7 @@ MTKMesh *_mesh;
             // What's going on?
             // This: MDLMesh newBoxWithDimensions segments 2
             [commandEncoder setTriangleFillMode: MTLTriangleFillModeFill]; // default
-            [commandEncoder setTriangleFillMode: MTLTriangleFillModeLines]; // wireframe
+            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines]; // wireframe
             
             
             // TEST: can we dynamically draw text? Yes!
@@ -567,11 +567,11 @@ MTKMesh *_mesh;
             // What we see is small incoorect cubelets from the cube mesh, that ARE affected by all font
             // algos.
             // TODO: make these visible first
-            [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                                       indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
-                                        indexType:MTLIndexTypeUInt16
-                                      indexBuffer:self.textMesh.indexBuffer
-                                indexBufferOffset:0];
+//            [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+//                                       indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
+//                                        indexType:MTLIndexTypeUInt16
+//                                      indexBuffer:self.textMesh.indexBuffer
+//                                indexBufferOffset:0];
             
             
             /////////////////////
@@ -580,6 +580,13 @@ MTKMesh *_mesh;
             // transformed by the vertex shader from the font atlas pipeline
             // Nono, it looks like they ARE from the textmesh: changing rect in buildTextMesh changes
             // the layout. So how can that be this cube?
+            // This vertexBuffer affects the quad drawing. It has to happen before drawIndexedPrimitives
+            // Hell, the first cubelets were of course not from the cube, but were out text:
+            // Frame: XXX
+            // FPS: 60
+            // Well, they WERE from the cube: they were the first (incorrect) vertices from the cube
+            // that got transformed by the vertex shader. Don't draw the cube and draw the font quads
+            // after vertexBuffer and it works!!!
             for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
             {
                 MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
@@ -594,23 +601,28 @@ MTKMesh *_mesh;
             [commandEncoder setFragmentTexture:_colorMap
                                       atIndex:0];
 
-            for(MTKSubmesh *submesh in _mesh.submeshes)
-            {
-                [commandEncoder drawIndexedPrimitives:submesh.primitiveType
-                                          indexCount:submesh.indexCount
-                                           indexType:submesh.indexType
-                                         indexBuffer:submesh.indexBuffer.buffer
-                                   indexBufferOffset:submesh.indexBuffer.offset];
-            }
+//            for(MTKSubmesh *submesh in _mesh.submeshes)
+//            {
+//                [commandEncoder drawIndexedPrimitives:submesh.primitiveType
+//                                          indexCount:submesh.indexCount
+//                                           indexType:submesh.indexType
+//                                         indexBuffer:submesh.indexBuffer.buffer
+//                                   indexBufferOffset:submesh.indexBuffer.offset];
+//            }
             /////////////////////
             
             // YYYYYeeeeessss!!! Breakthrough: Now these are being drawn and animated!!!!
             // What's going on???? Has to do with drawing order here.
+            // Yes: must do this after [commandEncoder setVertexBuffer...
+            // NOTE: the vertexbuffer now has the size of the cube mesh but must be set to that of the font quads
+            // NOTE2: when drawing filled we get black cubes. What's going on?
             [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                                   indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
                                                    indexType:MTLIndexTypeUInt16
                                                  indexBuffer:self.textMesh.indexBuffer
                                            indexBufferOffset:0];
+           
+            
             
             
 
