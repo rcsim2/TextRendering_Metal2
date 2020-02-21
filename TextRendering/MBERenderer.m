@@ -285,22 +285,22 @@ int i = 0;
 
 
 
-- (MTLRenderPassDescriptor *)newRenderPassWithColorAttachmentTexture:(id<MTLTexture>)texture
-{
-    MTLRenderPassDescriptor *renderPass = [MTLRenderPassDescriptor new];
-
-    renderPass.colorAttachments[0].texture = texture;
-    renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
-    renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
-    renderPass.colorAttachments[0].clearColor = MBEClearColor;
-
-    renderPass.depthAttachment.texture = self.depthTexture;
-    renderPass.depthAttachment.loadAction = MTLLoadActionClear;
-    renderPass.depthAttachment.storeAction = MTLStoreActionStore;
-    renderPass.depthAttachment.clearDepth = 1.0;
-
-    return renderPass;
-}
+//- (MTLRenderPassDescriptor *)newRenderPassWithColorAttachmentTexture:(id<MTLTexture>)texture
+//{
+//    MTLRenderPassDescriptor *renderPass = [MTLRenderPassDescriptor new];
+//
+//    renderPass.colorAttachments[0].texture = texture;
+//    renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
+//    renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
+//    renderPass.colorAttachments[0].clearColor = MBEClearColor;
+//
+//    renderPass.depthAttachment.texture = self.depthTexture;
+//    renderPass.depthAttachment.loadAction = MTLLoadActionClear;
+//    renderPass.depthAttachment.storeAction = MTLStoreActionStore;
+//    renderPass.depthAttachment.clearDepth = 1.0;
+//
+//    return renderPass;
+//}
 
 
 
@@ -361,6 +361,9 @@ int i = 0;
         MTLRenderPassDescriptor* renderPass = view.currentRenderPassDescriptor;
         
         // Mmm: failed assertion `Texture at colorAttachment[0] has usage (0x01) which doesn't specify MTLTextureUsageRenderTarget (0x04)'
+        // Done. Looks good now: we have black output so it looks like we are loading the font atlas texture
+        // Commenting out gives us white. All as expected.
+        // But there is probably somthing wrong with our view or model matrix.
         renderPass.colorAttachments[0].texture = _fontTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;

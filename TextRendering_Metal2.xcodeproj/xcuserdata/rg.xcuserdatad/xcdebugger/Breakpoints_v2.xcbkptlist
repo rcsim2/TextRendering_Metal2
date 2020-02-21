@@ -62,8 +62,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "382"
-            endingLineNumber = "382"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "-drawInMTKView:"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "390"
-            endingLineNumber = "390"
+            startingLineNumber = "393"
+            endingLineNumber = "393"
             landmarkName = "-drawInMTKView:"
             landmarkType = "7">
          </BreakpointContent>
@@ -110,8 +110,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "462"
-            endingLineNumber = "462"
+            startingLineNumber = "465"
+            endingLineNumber = "465"
             landmarkName = "-drawInMTKView:"
             landmarkType = "7">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
+            startingLineNumber = "469"
+            endingLineNumber = "469"
             landmarkName = "-drawInMTKView:"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "467"
-            endingLineNumber = "467"
+            startingLineNumber = "470"
+            endingLineNumber = "470"
             landmarkName = "-drawInMTKView:"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "TextRendering/MBERenderer.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "487"
-            endingLineNumber = "487"
+            startingLineNumber = "490"
+            endingLineNumber = "490"
             landmarkName = "-mtkView:drawableSizeWillChange:"
             landmarkType = "7">
          </BreakpointContent>
