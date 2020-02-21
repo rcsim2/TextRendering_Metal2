@@ -317,7 +317,7 @@ MTKMesh *_mesh;
 // Added text argument so we can call it dynamically
 - (void)buildTextMesh:(NSString*)text
 {
-    CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 100); // RG: text x,y from top left
+    CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 50); // RG: text x,y from top left
 
     _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//"MBESampleText
                                              inRect:textRect
@@ -563,7 +563,10 @@ MTKMesh *_mesh;
             [self buildTextMesh:str];
             
             
-
+            // SHIT: These font quads are not visible
+            // What we see is small incoorect cubelets from the cube mesh, that ARE affected by all font
+            // algos.
+            // TODO: make these visible first
             [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                        indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
                                         indexType:MTLIndexTypeUInt16
@@ -575,6 +578,8 @@ MTKMesh *_mesh;
             // Draw cube
             // TEST: we are getting small animated cubes: this is the mesh from our cube and the vertices are
             // transformed by the vertex shader from the font atlas pipeline
+            // Nono, it looks like they ARE from the textmesh: changing rect in buildTextMesh changes
+            // the layout. So how can that be this cube?
             for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
             {
                 MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
@@ -598,6 +603,14 @@ MTKMesh *_mesh;
                                    indexBufferOffset:submesh.indexBuffer.offset];
             }
             /////////////////////
+            
+            // YYYYYeeeeessss!!! Breakthrough: Now these are being drawn and animated!!!!
+            // What's going on???? Has to do with drawing order here.
+            [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+                                                  indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
+                                                   indexType:MTLIndexTypeUInt16
+                                                 indexBuffer:self.textMesh.indexBuffer
+                                           indexBufferOffset:0];
             
             
 
