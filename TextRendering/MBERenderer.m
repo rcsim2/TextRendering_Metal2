@@ -573,14 +573,16 @@ MTKMesh *_mesh;
             
             /////////////////////
             // Draw cube
+            // TEST: we are getting small animated cubes: this is the mesh from our cube and the vertices are
+            // transformed by the vertex shader from the font atlas pipeline
             for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
             {
                 MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
                 if((NSNull*)vertexBuffer != [NSNull null])
                 {
                     [commandEncoder setVertexBuffer:vertexBuffer.buffer
-                                            offset:vertexBuffer.offset
-                                           atIndex:bufferIndex];
+                                             offset:vertexBuffer.offset
+                                            atIndex:bufferIndex];
                 }
             }
 
