@@ -503,7 +503,7 @@ MTKMesh *_mesh;
             // What's going on?
             // This: MDLMesh newBoxWithDimensions segments 2
             [commandEncoder setTriangleFillMode: MTLTriangleFillModeFill]; // default
-            //[commandEncoder setTriangleFillMode: MTLTriangleFillModeLines]; // wireframe
+            [commandEncoder setTriangleFillMode: MTLTriangleFillModeLines]; // wireframe
             
             
             // TEST: can we dynamically draw text? Yes!
