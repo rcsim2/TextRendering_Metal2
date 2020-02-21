@@ -127,6 +127,7 @@ int i = 0;
 
     MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
 
+    // TEST:
     pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
 //    pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
 //    pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
@@ -136,6 +137,9 @@ int i = 0;
 //    pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 //    pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
 
+    // TEST: We crashed here with MTLPixelFormatDepth32Float because:
+    // failed assertion `For depth attachment, the renderPipelineState pixelFormat must be MTLPixelFormatInvalid, as no texture is set.'
+    // Using MTLPixelFormatInvalid makes the app run but without font texture, of course.
     pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatInvalid;//MTLPixelFormatDepth32Float;
     
     pipelineDescriptor.vertexFunction = [library newFunctionWithName:@"vertex_shade"];
