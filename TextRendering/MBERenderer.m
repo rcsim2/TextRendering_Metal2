@@ -68,7 +68,21 @@ NSTimeInterval start_time = 0;
 NSString *str3 = @"";
 int i = 0;
 
+
 id <MTLTexture> _colorMap;
+MTLVertexDescriptor *_mtlVertexDescriptor;
+
+typedef NS_ENUM(NSInteger, VertexAttribute)
+{
+    VertexAttributePosition  = 0,
+    VertexAttributeTexcoord  = 1,
+};
+
+MTKMesh *_mesh;
+
+
+
+
 
 
 
@@ -130,6 +144,33 @@ id <MTLTexture> _colorMap;
         {
             NSLog(@"Error creating texture %@", error.localizedDescription);
         }
+        
+        
+        MTKMeshBufferAllocator *metalAllocator = [[MTKMeshBufferAllocator alloc]
+                                                  initWithDevice: _device];
+
+        MDLMesh *mdlMesh = [MDLMesh newBoxWithDimensions:(vector_float3){4, 4, 4}
+                                                segments:(vector_uint3){2, 2, 2}
+                                            geometryType:MDLGeometryTypeTriangles
+                                           inwardNormals:NO
+                                               allocator:metalAllocator];
+
+        MDLVertexDescriptor *mdlVertexDescriptor =
+        MTKModelIOVertexDescriptorFromMetal(_mtlVertexDescriptor);
+
+        mdlVertexDescriptor.attributes[VertexAttributePosition].name  = MDLVertexAttributePosition;
+        mdlVertexDescriptor.attributes[VertexAttributeTexcoord].name  = MDLVertexAttributeTextureCoordinate;
+
+        mdlMesh.vertexDescriptor = mdlVertexDescriptor;
+
+        _mesh = [[MTKMesh alloc] initWithMesh:mdlMesh
+                                       device:_device
+                                        error:&error];
+
+        if(!_mesh || error)
+        {
+            NSLog(@"Error creating MetalKit mesh %@", error.localizedDescription);
+        }
         /////////////////////////
     }
 
@@ -161,7 +202,7 @@ id <MTLTexture> _colorMap;
     MTLRenderPipelineDescriptor *pipelineDescriptor = [MTLRenderPipelineDescriptor new];
 
     // TEST:
-    pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB;//MTLPixelFormatBGRA8Unorm;
+    pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;//MTLPixelFormatRGBA8Unorm_sRGB;//
     pipelineDescriptor.colorAttachments[0].blendingEnabled = YES;
     pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
     pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
@@ -390,16 +431,6 @@ id <MTLTexture> _colorMap;
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     //id<CAMetalDrawable> drawable = [self.layer nextDrawable];
 
     //if (drawable)
@@ -431,7 +462,7 @@ id <MTLTexture> _colorMap;
         // But there is probably somthing wrong with our view or model matrix.
         // TEST: with colorMap texture
         // Mmm, don't get any texture, only black.
-        renderPass.colorAttachments[0].texture = _colorMap;//_fontTexture; // _fontTexture is the font atlas
+        //renderPass.colorAttachments[0].texture = _colorMap;//_fontTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
@@ -538,6 +569,35 @@ id <MTLTexture> _colorMap;
                                         indexType:MTLIndexTypeUInt16
                                       indexBuffer:self.textMesh.indexBuffer
                                 indexBufferOffset:0];
+            
+            
+            /////////////////////
+            // Draw cube
+            for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
+            {
+                MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
+                if((NSNull*)vertexBuffer != [NSNull null])
+                {
+                    [commandEncoder setVertexBuffer:vertexBuffer.buffer
+                                            offset:vertexBuffer.offset
+                                           atIndex:bufferIndex];
+                }
+            }
+
+            [commandEncoder setFragmentTexture:_colorMap
+                                      atIndex:0];
+
+            for(MTKSubmesh *submesh in _mesh.submeshes)
+            {
+                [commandEncoder drawIndexedPrimitives:submesh.primitiveType
+                                          indexCount:submesh.indexCount
+                                           indexType:submesh.indexType
+                                         indexBuffer:submesh.indexBuffer.buffer
+                                   indexBufferOffset:submesh.indexBuffer.offset];
+            }
+            /////////////////////
+            
+            
 
             [commandEncoder endEncoding];
 
@@ -559,7 +619,7 @@ id <MTLTexture> _colorMap;
     //float aspect = size.width / (float)size.height;
     //_projectionMatrix = matrix_perspective_right_hand(65.0f * (M_PI / 180.0f), aspect, 0.1f, 100.0f);
     
-    //[self updateUniforms:view];
+    [self updateUniforms:view];
 }
 
 
