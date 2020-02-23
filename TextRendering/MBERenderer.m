@@ -301,12 +301,18 @@ MTKMesh *_mesh;
     MTLRegion region = MTLRegionMake2D(0, 0, MBEFontAtlasSize, MBEFontAtlasSize);
     
     // TODO: We need MTLTextureUsageRenderTarget for _fontTexture
+    // DONE
     //textureDesc.usage = MTLTextureUsageRenderTarget;
     textureDesc.usage = MTLTextureUsageRenderTarget & MTLTextureUsageShaderRead;
     
     _fontTexture = [_device newTextureWithDescriptor:textureDesc];
     [_fontTexture setLabel:@"Font Atlas"];
-    //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
+    
+    // NOTE: The reason for the un-textured black quads was because we commented out this line doing our
+    // quick and dirty hack. It is crucial for the font atlas texture however.
+    // Yyyesss!!! we were getting validateReplaceRegion:183: failed assertion `rowBytes(2048) must be >= (8192).'
+    // Hardcoding 8192 for bytesPerRow gives quad textures but they are incorrect. Why?
+    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:8192];//MBEFontAtlasSize];
 }
 
 
@@ -346,7 +352,7 @@ MTKMesh *_mesh;
                                                                                           width:drawableSize.width
                                                                                          height:drawableSize.height
                                                                                       mipmapped:NO];
-    // RG: this was what we needed to get this sample running on macOS
+    // RG: this was what we needed to get this sample running on macOS via Mac Catalyst
     // Build succeeded but then we got runtime errors because these were not set
     descriptor.storageMode = MTLStorageModePrivate;
     descriptor.usage = MTLTextureUsageRenderTarget;// & MTLTextureUsageShaderRead;
@@ -440,7 +446,7 @@ MTKMesh *_mesh;
 //
 //        if ([self.depthTexture width] != drawableSize.width || [self.depthTexture height] != drawableSize.height)
 //        {
-            //[self buildDepthTexture:view];
+            //[self buildDepthTexture];
             [self buildDepthTexture:view];
 //        }
         
@@ -453,6 +459,7 @@ MTKMesh *_mesh;
         // DONE: Well, we have that now. But now we get: failed assertion `PixelFormat
         // MTLPixelFormatDepth32Float is not color renderable'
         //
+        // Set renderpass descriptor here, not in a function
         //MTLRenderPassDescriptor *renderPass = [self newRenderPassWithColorAttachmentTexture:[drawable texture]];
         MTLRenderPassDescriptor* renderPass = view.currentRenderPassDescriptor;
         
@@ -464,7 +471,9 @@ MTKMesh *_mesh;
         // Mmm, don't get any texture, only black.
         // Shit: renderPass.colorAttachments[0].texture takes the depth texture, not _fontTexture
         // Put depthTexture here but we get: failed assertion `PixelFormat MTLPixelFormatDepth32Float is not color renderable'
-        //renderPass.colorAttachments[0].texture = self.depthTexture; // _fontTexture is the font atlas
+        // NOTE: cannot set _fontTexture here, must do it later with [commandEncoder setFragmentTexture:
+        // Why? And is it the fontTexture we must set here?
+        //renderPass.colorAttachments[0].texture = _fontTexture;// _fontTexture
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
@@ -484,7 +493,8 @@ MTKMesh *_mesh;
 
             id<MTLCommandBuffer> commandBuffer = [self.commandQueue commandBuffer];
 
-            id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPass];
+            id<MTLRenderCommandEncoder> commandEncoder =
+                                    [commandBuffer renderCommandEncoderWithDescriptor:renderPass];
             [commandEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
             [commandEncoder setCullMode:MTLCullModeNone];
             
@@ -589,22 +599,31 @@ MTKMesh *_mesh;
             // Well, they WERE from the cube: they were the first (incorrect) vertices from the cube
             // that got transformed by the vertex shader. Don't draw the cube and draw the font quads
             // after vertexBuffer and it works!!!
-            for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
-            {
-                MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
-                if((NSNull*)vertexBuffer != [NSNull null])
-                {
-                    [commandEncoder setVertexBuffer:vertexBuffer.buffer
-                                             offset:vertexBuffer.offset
-                                            atIndex:bufferIndex];
-                }
-            }
+//            for (NSUInteger bufferIndex = 0; bufferIndex < _mesh.vertexBuffers.count; bufferIndex++)
+//            {
+//                MTKMeshBuffer *vertexBuffer = _mesh.vertexBuffers[bufferIndex];
+//                if((NSNull*)vertexBuffer != [NSNull null])
+//                {
+//                    [commandEncoder setVertexBuffer:vertexBuffer.buffer
+//                                             offset:vertexBuffer.offset
+//                                            atIndex:bufferIndex];
+//                }
+//            }
 
             // Well, well. This is causing things to work or not.
             // Leave this out and we get no black quads. Why?????
-            // Ah, we must put our fontAtlas texture here???
-            [commandEncoder setFragmentTexture:_colorMap
-                                      atIndex:0];
+            // Mmm, got to put our _fontTexture texture here??? No, no go.
+            // NONO: we already do this in the code before. Reason for it not working is we were making an
+            // fault font atlas
+//            [commandEncoder setFragmentTexture:_fontTexture//colorMap//_fontTexture
+//                                      atIndex:0];
+            
+            
+//            [commandEncoder setVertexTexture:_fontTexture//
+//            atIndex:0];
+//            [commandEncoder setFragmentTexture:_fontTexture//
+//            atIndex:0];
+            
 //
 //            for(MTKSubmesh *submesh in _mesh.submeshes)
 //            {
@@ -624,6 +643,8 @@ MTKMesh *_mesh;
             // Odd: we aren't even reaching [commandEncoder setVertexBuffer because
             // _mesh.vertexBuffers.count == 0
             // Why does it still work???
+            // NONO: must do this after [commandEncoder setFragmentTexture:_colorMap to get it to show at all.
+            // Why???
             [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                                   indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
                                                    indexType:MTLIndexTypeUInt16
