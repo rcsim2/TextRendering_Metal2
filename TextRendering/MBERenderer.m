@@ -123,7 +123,7 @@ MTKMesh *_mesh;
         
         
         ///////////////////////
-        // TEST: texture
+        // TEST: texture and cube
         NSError *error;
         
         MTKTextureLoader* textureLoader = [[MTKTextureLoader alloc] initWithDevice:_device];
@@ -462,7 +462,9 @@ MTKMesh *_mesh;
         // But there is probably somthing wrong with our view or model matrix.
         // TEST: with colorMap texture
         // Mmm, don't get any texture, only black.
-        //renderPass.colorAttachments[0].texture = _fontTexture; // _fontTexture is the font atlas
+        // Shit: renderPass.colorAttachments[0].texture takes the depth texture, not _fontTexture
+        // Put depthTexture here but we get: failed assertion `PixelFormat MTLPixelFormatDepth32Float is not color renderable'
+        //renderPass.colorAttachments[0].texture = self.depthTexture; // _fontTexture is the font atlas
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
         renderPass.colorAttachments[0].clearColor = MBEClearColor;
@@ -598,9 +600,12 @@ MTKMesh *_mesh;
                 }
             }
 
+            // Well, well. This is causing things to work or not.
+            // Leave this out and we get no black quads. Why?????
+            // Ah, we must put our fontAtlas texture here???
             [commandEncoder setFragmentTexture:_colorMap
                                       atIndex:0];
-
+//
 //            for(MTKSubmesh *submesh in _mesh.submeshes)
 //            {
 //                [commandEncoder drawIndexedPrimitives:submesh.primitiveType
@@ -616,6 +621,9 @@ MTKMesh *_mesh;
             // Yes: must do this after [commandEncoder setVertexBuffer...
             // NOTE: the vertexbuffer now has the size of the cube mesh but must be set to that of the font quads
             // NOTE2: when drawing filled we get black cubes. What's going on?
+            // Odd: we aren't even reaching [commandEncoder setVertexBuffer because
+            // _mesh.vertexBuffers.count == 0
+            // Why does it still work???
             [commandEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                                   indexCount:[self.textMesh.indexBuffer length] / sizeof(MBEIndexType)
                                                    indexType:MTLIndexTypeUInt16
