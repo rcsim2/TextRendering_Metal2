@@ -294,7 +294,7 @@ MTKMesh *_mesh;
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path];
     }
 
-    MTLTextureDescriptor *textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+    MTLTextureDescriptor *textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatR8Unorm
                                                                                            width:MBEFontAtlasSize
                                                                                           height:MBEFontAtlasSize
                                                                                        mipmapped:NO];
@@ -312,7 +312,26 @@ MTKMesh *_mesh;
     // quick and dirty hack. It is crucial for the font atlas texture however.
     // Yyyesss!!! we were getting validateReplaceRegion:183: failed assertion `rowBytes(2048) must be >= (8192).'
     // Hardcoding 8192 for bytesPerRow gives quad textures but they are incorrect. Why?
-    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:8192];//MBEFontAtlasSize];
+    // Seems that failed assertion is also strange: the argument is bytesPerRow not rowBytes. And the value we
+    // give it is 4096 (MBEFontAtlasSize) not 2048.
+    // NONO: MBEFontAtlasSize is 2048. When hovering over it in MTLRegionMake2D above when hitting a breakpoint
+    // we get 4096. Why??? Because it is declared as 4096 in MBEFontAtlas.m?
+    // This IDE and API is be so buggy.
+    // Also, when trying to look what the texture looks like by hovering and clicking the eye icon, it takes
+    // Xcode several tries to show the contents of the texture.
+    // NOTE: we have to turn off Metal API Validation in the Scheme to get past this code with bytesPerRow == 2048.
+    // But our font atlas texture is still not OK. It repeats 4x horizontally.
+    // YESS!!!!: Stupid: one way or the other we had MTLPixelFormatBGRA8Unorm instead of MTLPixelFormatR8Unorm
+    // in texture2DDescriptorWithPixelFormat above with the code hidden by the Minimap.
+    // Coding on a MacBook Air is such a nono.
+    // TODO: text prints fine now but still looks but-ugly with wobbly font.
+    // See: http://liu.diva-portal.org/smash/get/diva2:618269/FULLTEXT02.pdf
+    //
+    //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
+    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:2048];
+    
+    // TEST:
+    [_fontTexture setLabel:@"Font Atlas2"];
 }
 
 
