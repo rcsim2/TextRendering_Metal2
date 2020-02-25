@@ -21,8 +21,8 @@
 
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
 
-static NSString *const MBEFontName = @"Arial";//@"HoeflerText-Regular";
-static float MBEFontDisplaySize = 88; // NOTE: Huge size looks better
+static NSString *const MBEFontName = @"Arial Black";//@"HoeflerText-Regular";
+static float MBEFontDisplaySize = 72; // NOTE: Huge size looks better
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
@@ -119,7 +119,7 @@ MTKMesh *_mesh;
         [self buildResources];
         
         // NOTE: the trick is to use a huge font size and scale it down: looks much better.
-        _textScale = 0.4;//1.0;
+        _textScale = 0.6;//1.0;
         _textTranslation = CGPointMake(0, 0);
         
         
@@ -288,14 +288,16 @@ MTKMesh *_mesh;
     // Not from MBEFontAtlasSize. 2048 must be some standard value.
     // It is getting it from the .sdff (signed-distance field) files that were previously made at:
     // /Users/rg/Library/Containers/com.metalbyexample.TextRendering-Metal2/Data/Documents
+    // For testing it is better to regenerate.
     _fontAtlas = [NSKeyedUnarchiver unarchiveObjectWithFile:fontURL.path]; // read file
 #endif
 
     // NOTE: Only get here if a .sdff file was not previously made
+    // NOTE2: Using size:MBEFontDisplaySize doesn't do much
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
     if (!_fontAtlas)
     {
-        NSFont *font = [NSFont fontWithName:MBEFontName size:32]; // NOTE: Using MBEFontDisplaySize does do much
+        NSFont *font = [NSFont fontWithName:MBEFontName size:32];
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save file
     }
