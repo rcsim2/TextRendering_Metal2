@@ -21,8 +21,8 @@
 
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
 
-static NSString *const MBEFontName = @"Arial Black";//@"HoeflerText-Regular";
-static float MBEFontDisplaySize = 72; // NOTE: Huge size looks better
+static NSString *const MBEFontName = @"Times Bold Italic";//@"HoeflerText-Regular";
+static float MBEFontDisplaySize = 72; // NOTE: Huge size looks better, 72 in the original sample is OK.
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
