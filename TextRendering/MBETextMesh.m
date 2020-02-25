@@ -23,6 +23,8 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
 @synthesize vertexBuffer=_vertexBuffer;
 @synthesize indexBuffer=_indexBuffer;
 
+
+// One
 - (instancetype)initWithString:(NSString *)string
                         inRect:(CGRect)rect
                       withFontAtlas:(MBEFontAtlas *)fontAtlas
@@ -38,14 +40,28 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
 
 
 
-
+// Two
 - (void)buildMeshWithString:(NSString *)string
                      inRect:(CGRect)rect
                    withFont:(MBEFontAtlas *)fontAtlas
                      atSize:(CGFloat)fontSize
                      device:(id<MTLDevice>)device
 {
-    NSFont *font = [NSFont fontWithName:@"Times" size:42];
+    // NOTE: we have hardcoded Times to make it work. Now get rid of it because it is causing wobbly font when building
+    // for Arial or any other font, of course.
+    //UIFont *font = [fontAtlas.parentFont fontWithSize:fontSize];
+    
+    //NSFont *font = [fontAtlas.parentFont fontWithSize:fontSize];
+    //NSFont *font = [NSFont fontWithName:@"Times" size:fontSize];
+    //NSFont *font = [NSFont fontWithName:@"Arial" size:fontSize];
+    //NSFont *font = [NSFont fontWithName:MBEFontName size:fontSize];
+    NSFont *font = [NSFont fontWithName:fontAtlas.parentFont.fontName size:fontSize];
+    
+    // TEST:
+    //NSString *str = fontAtlas.parentFont.fontName;
+    
+    
+    
     NSDictionary *attributes = @{ NSFontAttributeName : font };
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:attributes];
     CFRange stringRange = CFRangeMake(0, attrString.length);
@@ -108,6 +124,8 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
     CFRelease(rectPath);
 }
 
+
+
 - (void)enumerateGlyphsInFrame:(CTFrameRef)frame
                          block:(MBEGlyphPositionEnumerationBlock)block
 {
@@ -129,7 +147,7 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
     //UIGraphicsBeginImageContext(CGSizeMake(1, 1));
     
     //CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextRef context =  CGBitmapContextCreate(0, 4096, 4096, 8, 4096*4, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
+    CGContextRef context =  CGBitmapContextCreate(0, 4096, 4096, 8, 4096*1, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
 
     
 

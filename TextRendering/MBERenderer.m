@@ -22,7 +22,7 @@
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 0
 
 static NSString *const MBEFontName = @"Arial";//@"HoeflerText-Regular";
-static float MBEFontDisplaySize = 72;
+static float MBEFontDisplaySize = 42;
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
@@ -294,10 +294,12 @@ MTKMesh *_mesh;
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path];
     }
 
-    MTLTextureDescriptor *textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatR8Unorm
-                                                                                           width:MBEFontAtlasSize
-                                                                                          height:MBEFontAtlasSize
-                                                                                       mipmapped:NO];
+    MTLTextureDescriptor *textureDesc;
+    textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatR8Unorm
+                                                                     width:MBEFontAtlasSize
+                                                                    height:MBEFontAtlasSize
+                                                                 mipmapped:NO];
+    
     MTLRegion region = MTLRegionMake2D(0, 0, MBEFontAtlasSize, MBEFontAtlasSize);
     
     // TODO: We need MTLTextureUsageRenderTarget for _fontTexture
@@ -316,7 +318,7 @@ MTKMesh *_mesh;
     // give it is 4096 (MBEFontAtlasSize) not 2048.
     // NONO: MBEFontAtlasSize is 2048. When hovering over it in MTLRegionMake2D above when hitting a breakpoint
     // we get 4096. Why??? Because it is declared as 4096 in MBEFontAtlas.m?
-    // This IDE and API is be so buggy.
+    // This IDE and API is so buggy.
     // Also, when trying to look what the texture looks like by hovering and clicking the eye icon, it takes
     // Xcode several tries to show the contents of the texture.
     // NOTE: we have to turn off Metal API Validation in the Scheme to get past this code with bytesPerRow == 2048.
@@ -324,11 +326,22 @@ MTKMesh *_mesh;
     // YESS!!!!: Stupid: one way or the other we had MTLPixelFormatBGRA8Unorm instead of MTLPixelFormatR8Unorm
     // in texture2DDescriptorWithPixelFormat above with the code hidden by the Minimap.
     // Coding on a MacBook Air is such a nono.
-    // TODO: text prints fine now but still looks but-ugly with wobbly font.
+    // TODO: text prints fine now but still looks butt-ugly with wobbly font.
     // See: http://liu.diva-portal.org/smash/get/diva2:618269/FULLTEXT02.pdf
+    // Times font looks OK but Arial looks particularly nasty. Especially, l and i.
+    // The original sample definitely looks better (on Mac Catalyst) so it may be a UIKit vs Cocao issue.
+    // But also there it doesn't really look good for Arial: wobbly font.
+    // Anyway, shouldn't this stuff all be handled by some basic Metal text API? It's 2020.
+    // NOTE: the code here and in the original sample is very finicky: MBEFontAtlasSize can only be 2048
+    // (no go for e.g. 1024, 4096, etc.)
+    // NOTE: one way or another we are getting through now with Metal API Validation Enabled.
+    // OKOK: getting better: this was a quick and dirty hack and we have hardcoded several things to make
+    // it work. E.g. in buildMeshWithString in MBETextMesh.m where we were using Times. No wonder font
+    // looks wobbly when using Arial here for MBEFontName.
+    // Gotta do a diff with the original sample to check things that we have changed for Cocao.
     //
-    //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
-    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:2048];
+    [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
+    //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:2048];
     
     // TEST:
     [_fontTexture setLabel:@"Font Atlas2"];
@@ -344,7 +357,7 @@ MTKMesh *_mesh;
 {
     CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 50); // RG: text x,y from top left
 
-    _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//"MBESampleText
+    _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//MBESampleText
                                              inRect:textRect
                                       withFontAtlas:_fontAtlas
                                              atSize:MBEFontDisplaySize
@@ -490,7 +503,8 @@ MTKMesh *_mesh;
         // Mmm, don't get any texture, only black.
         // Shit: renderPass.colorAttachments[0].texture takes the depth texture, not _fontTexture
         // Put depthTexture here but we get: failed assertion `PixelFormat MTLPixelFormatDepth32Float is not color renderable'
-        // NOTE: cannot set _fontTexture here, must do it later with [commandEncoder setFragmentTexture:
+        // NOTE: cannot set _fontTexture here, must do it later with [commandEncoder setFragmentTexture: or
+        // we get a total black screen.
         // Why? And is it the fontTexture we must set here?
         //renderPass.colorAttachments[0].texture = _fontTexture;// _fontTexture
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
@@ -525,7 +539,7 @@ MTKMesh *_mesh;
             [commandEncoder setVertexBuffer:self.uniformBuffer offset:0 atIndex:1];
 
             [commandEncoder setFragmentBuffer:self.uniformBuffer offset:0 atIndex:0];
-            [commandEncoder setFragmentTexture:self.fontTexture atIndex:0];
+            [commandEncoder setFragmentTexture:self.fontTexture atIndex:0]; // set _fontTexture for fragment shader
             [commandEncoder setFragmentSamplerState:self.sampler atIndex:0];
             
             
@@ -634,8 +648,8 @@ MTKMesh *_mesh;
             // Mmm, got to put our _fontTexture texture here??? No, no go.
             // NONO: we already do this in the code before. Reason for it not working is we were making an
             // fault font atlas
-//            [commandEncoder setFragmentTexture:_fontTexture//colorMap//_fontTexture
-//                                      atIndex:0];
+            [commandEncoder setFragmentTexture:_fontTexture//colorMap//_fontTexture
+                                      atIndex:0];
             
             
 //            [commandEncoder setVertexTexture:_fontTexture//
