@@ -19,10 +19,10 @@
 
 
 
-#define MBE_FORCE_REGENERATE_FONT_ATLAS 0
+#define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
 
 static NSString *const MBEFontName = @"Arial";//@"HoeflerText-Regular";
-static float MBEFontDisplaySize = 42;
+static float MBEFontDisplaySize = 88; // NOTE: Huge size looks better
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
@@ -118,7 +118,8 @@ MTKMesh *_mesh;
         [self buildMetal];
         [self buildResources];
         
-        _textScale = 1.0;
+        // NOTE: the trick is to use a huge font size and scale it down: looks much better.
+        _textScale = 1.0;//1.0;
         _textTranslation = CGPointMake(0, 0);
         
         
@@ -283,15 +284,20 @@ MTKMesh *_mesh;
     NSURL *fontURL = [[self.documentsURL URLByAppendingPathComponent:MBEFontName] URLByAppendingPathExtension:@"sdff"];
 
 #if !MBE_FORCE_REGENERATE_FONT_ATLAS
-    _fontAtlas = [NSKeyedUnarchiver unarchiveObjectWithFile:fontURL.path];
+    // How does this work? How can it fill _fontAtlas._textureSize == 2048 ???
+    // Not from MBEFontAtlasSize. 2048 must be some standard value.
+    // It is getting it from the .sdff (signed-distance field) files that were previously made at:
+    // /Users/rg/Library/Containers/com.metalbyexample.TextRendering-Metal2/Data/Documents
+    _fontAtlas = [NSKeyedUnarchiver unarchiveObjectWithFile:fontURL.path]; // read file
 #endif
 
+    // NOTE: Only get here if a .sdff file was not previously made
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
     if (!_fontAtlas)
     {
-        NSFont *font = [NSFont fontWithName:MBEFontName size:32];
+        NSFont *font = [NSFont fontWithName:MBEFontName size:MBEFontDisplaySize];//32];
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
-        [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path];
+        [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save file
     }
 
     MTLTextureDescriptor *textureDesc;
@@ -339,6 +345,7 @@ MTKMesh *_mesh;
     // it work. E.g. in buildMeshWithString in MBETextMesh.m where we were using Times. No wonder font
     // looks wobbly when using Arial here for MBEFontName.
     // Gotta do a diff with the original sample to check things that we have changed for Cocao.
+    // Times is acceptable now. But still ugly in Arial: e.g. second l in Hallo, S in FPS, 6 in 60 etc.
     //
     [_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:MBEFontAtlasSize];
     //[_fontTexture replaceRegion:region mipmapLevel:0 withBytes:_fontAtlas.textureData.bytes bytesPerRow:2048];
@@ -445,7 +452,7 @@ MTKMesh *_mesh;
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
     // Yess!!
-    // Were in the loop
+    // We're in the loop
     
     
     // Boilerplate
@@ -647,9 +654,9 @@ MTKMesh *_mesh;
             // Leave this out and we get no black quads. Why?????
             // Mmm, got to put our _fontTexture texture here??? No, no go.
             // NONO: we already do this in the code before. Reason for it not working is we were making an
-            // fault font atlas
-            [commandEncoder setFragmentTexture:_fontTexture//colorMap//_fontTexture
-                                      atIndex:0];
+            // fault font atlas. So we don't need this here either.
+//            [commandEncoder setFragmentTexture:_fontTexture//colorMap//_fontTexture
+//                                      atIndex:0];
             
             
 //            [commandEncoder setVertexTexture:_fontTexture//

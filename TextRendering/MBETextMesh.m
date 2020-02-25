@@ -147,7 +147,7 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
     //UIGraphicsBeginImageContext(CGSizeMake(1, 1));
     
     //CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextRef context =  CGBitmapContextCreate(0, 4096, 4096, 8, 4096*1, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
+    CGContextRef context =  CGBitmapContextCreate(0, 4096, 4096, 8, 4096*4, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
 
     
 
