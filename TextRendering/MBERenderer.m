@@ -87,22 +87,22 @@ MTKMesh *_mesh;
 
 
 // Old
-- (instancetype)initWithLayer:(CAMetalLayer *)layer
-{
-    if ((self = [super init]))
-    {
-        _layer = layer;
-        [self buildMetal];
-        [self buildResources];
-
-        _textScale = 1.0;
-        _textTranslation = CGPointMake(0, 0);
-        
-        // init
-        //start = clock();
-    }
-    return self;
-}
+//- (instancetype)initWithLayer:(CAMetalLayer *)layer
+//{
+//    if ((self = [super init]))
+//    {
+//        _layer = layer;
+//        [self buildMetal];
+//        [self buildResources];
+//
+//        _textScale = 1.0;
+//        _textTranslation = CGPointMake(0, 0);
+//
+//        // init
+//        //start = clock();
+//    }
+//    return self;
+//}
 
 
 // New
@@ -119,7 +119,7 @@ MTKMesh *_mesh;
         [self buildResources];
         
         // NOTE: the trick is to use a huge font size and scale it down: looks much better.
-        _textScale = 1.0;//1.0;
+        _textScale = 0.4;//1.0;
         _textTranslation = CGPointMake(0, 0);
         
         
@@ -295,7 +295,7 @@ MTKMesh *_mesh;
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
     if (!_fontAtlas)
     {
-        NSFont *font = [NSFont fontWithName:MBEFontName size:MBEFontDisplaySize];//32];
+        NSFont *font = [NSFont fontWithName:MBEFontName size:32]; // NOTE: Using MBEFontDisplaySize does do much
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save file
     }
