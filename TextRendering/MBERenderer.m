@@ -21,8 +21,10 @@
 
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
 
-static NSString *const MBEFontName = @"Times Bold Italic";//@"HoeflerText-Regular";
-static float MBEFontDisplaySize = 72; // NOTE: Huge size looks better, 72 in the original sample is OK.
+// NOTE: try different combinations of fonts and sizes and scale; one size smaller or bigger gets rid of glyph errors
+
+static NSString *const MBEFontName = @"American Typewriter";//@"HoeflerText-Regular"; // NOTE: bold italic text looks best
+static float MBEFontDisplaySize = 72; // NOTE: huge size looks better, 72 in the original sample is OK.
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
@@ -119,7 +121,7 @@ MTKMesh *_mesh;
         [self buildResources];
         
         // NOTE: the trick is to use a huge font size and scale it down: looks much better.
-        _textScale = 0.6;//1.0;
+        _textScale = 1.0;//1.0;
         _textTranslation = CGPointMake(0, 0);
         
         
@@ -287,7 +289,7 @@ MTKMesh *_mesh;
     // How does this work? How can it fill _fontAtlas._textureSize == 2048 ???
     // Not from MBEFontAtlasSize. 2048 must be some standard value.
     // It is getting it from the .sdff (signed-distance field) files that were previously made at:
-    // /Users/rg/Library/Containers/com.metalbyexample.TextRendering-Metal2/Data/Documents
+    // ~/Library/Containers/com.metalbyexample.TextRendering-Metal2/Data/Documents
     // For testing it is better to regenerate.
     _fontAtlas = [NSKeyedUnarchiver unarchiveObjectWithFile:fontURL.path]; // read file
 #endif
@@ -364,7 +366,7 @@ MTKMesh *_mesh;
 // Added text argument so we can call it dynamically
 - (void)buildTextMesh:(NSString*)text
 {
-    CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 100, 50); // RG: text x,y from top left
+    CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 40, 0); // RG: text x,y from top left
 
     _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//MBESampleText
                                              inRect:textRect
@@ -613,7 +615,7 @@ MTKMesh *_mesh;
             
             // Print FPS onscreen
             //NSString *string1 = [NSString stringWithFormat:@"A string: %@, a float: %1.2f", @"string", 31415.9265];
-            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\n\n%@", frame, fps, str3];
+            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\nFont: %@\n\n%@", frame, fps, MBEFontName, str3];
             [self buildTextMesh:str];
             
             
