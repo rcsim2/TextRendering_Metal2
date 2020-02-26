@@ -21,7 +21,14 @@
 
 #define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
 
-// NOTE: try different combinations of fonts and sizes and scale; one size smaller or bigger gets rid of glyph errors
+// NOTE: try different combinations of fonts and sizes and scale; one size smaller or bigger gets rid of glyph
+// TODO:
+// * use font dialog to let user switch fonts and sizes and colors
+// * menu option to have text animated, print Frame, FPS, etc.
+// * dialog box to let user set text
+// * typing sound when animated text
+// * implement gestures as in original
+
 
 static NSString *const MBEFontName = @"American Typewriter";//@"HoeflerText-Regular"; // NOTE: bold italic text looks best
 static float MBEFontDisplaySize = 72; // NOTE: huge size looks better, 72 in the original sample is OK.
@@ -39,7 +46,7 @@ static float MBEFontAtlasSize = 2048;
 
 
 @interface MBERenderer ()
-@property (nonatomic, strong) CAMetalLayer *layer;
+//@property (nonatomic, strong) CAMetalLayer *layer;
 // Long-lived Metal objects
 @property (nonatomic, strong) id<MTLDevice> device;
 @property (nonatomic, strong) id<MTLCommandQueue> commandQueue;
@@ -189,8 +196,8 @@ MTKMesh *_mesh;
 - (void)buildMetal
 {
     _device = MTLCreateSystemDefaultDevice();
-    _layer.device = _device;
-    _layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
+    //_layer.device = _device;
+    //_layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
 
     _commandQueue = [_device newCommandQueue];
 
