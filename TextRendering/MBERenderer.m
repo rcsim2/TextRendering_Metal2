@@ -616,7 +616,7 @@ MTKMesh *_mesh;
             
             // Print FPS onscreen
             //NSString *string1 = [NSString stringWithFormat:@"A string: %@, a float: %1.2f", @"string", 31415.9265];
-            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\nFont: %@\n\n%@", frame, fps, MBEFontName, str2];
+            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\nFont: %@\n\n%@", frame, fps, MBEFontName, str3];
             [self buildTextMesh:str];
             
             
