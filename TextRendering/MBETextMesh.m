@@ -96,6 +96,36 @@ typedef void (^MBEGlyphPositionEnumerationBlock)(CGGlyph glyph,
         float maxS = glyphInfo.bottomRightTexCoord.x;
         float minT = glyphInfo.topLeftTexCoord.y;
         float maxT = glyphInfo.bottomRightTexCoord.y;
+        
+        
+        ///////////////////////////////////////
+        // NOTE: Add some padding to avoid clipping. For font American Typewriter we see clipping at top and
+        // bottom of e, a and o glyphs. This code gets rid of the clipping.
+        //———————-
+        // inflate by 2.0 pixels
+        //———————-
+        float heightY = maxY - minY;
+        if (heightY > 0.0000001)
+        {
+            float heightT = maxT - minT;
+            float bounds_inflation = 2.0;
+            float info_inflation = bounds_inflation * heightT / heightY;
+            minY -= bounds_inflation;
+            maxY += bounds_inflation;
+            minT -= info_inflation;
+            maxT += info_inflation;
+            //———————-
+            float heightX = maxX - minX;
+            float heightS = maxS - minS;
+            info_inflation = bounds_inflation * heightS / heightX;
+            minX -= bounds_inflation;
+            maxX += bounds_inflation;
+            minS -= info_inflation;
+            maxS += info_inflation;
+        }
+        //////////////////////////////////////
+        
+        
         vertices[v++] = (MBEVertex){ { minX, maxY, 0, 1 }, { minS, maxT } };
         vertices[v++] = (MBEVertex){ { minX, minY, 0, 1 }, { minS, minT } };
         vertices[v++] = (MBEVertex){ { maxX, minY, 0, 1 }, { maxS, minT } };
