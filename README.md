@@ -14,6 +14,6 @@ Pure Cocoa (no Mac Catalyst)
 ## References
 
 * [Green](https://github.com/rcsim2/TextRendering_Metal2/blob/master/docs/Green_SIGGRAPH2007_AlphaTestedMagnification.pdf)
-* Grevera
-* Gustavson
+* [Grevera](https://github.com/rcsim2/TextRendering_Metal2/blob/master/docs/Grevera_04.pdf)
+* [Gustavson](https://github.com/rcsim2/TextRendering_Metal2/blob/master/docs/Gustavson_FULLTEXT02.pdf)
 
