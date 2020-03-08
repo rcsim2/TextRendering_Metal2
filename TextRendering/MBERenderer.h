@@ -12,6 +12,7 @@
 @import QuartzCore.CAMetalLayer;
 
 
+
 @interface MBERenderer : NSObject <MTKViewDelegate>
 
 @property (nonatomic, assign) CGPoint textTranslation;
@@ -20,7 +21,7 @@
 
 ///////
 @property (nonatomic, assign) NSString * _Nonnull mbeFontName;
-@property (nonatomic, assign) float mbeFontDisplaySize;
+@property (nonatomic, assign) float               mbeFontDisplaySize;
 
 
 

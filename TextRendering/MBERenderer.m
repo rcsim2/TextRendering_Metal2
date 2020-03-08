@@ -32,10 +32,10 @@
 
 //static NSString *const MBEFontName = @"American Typewriter";//@"HoeflerText-Regular"; // NOTE: bold italic text looks best
 //static float MBEFontDisplaySize = 72; // NOTE: huge size looks better, 72 in the original sample is OK.
-static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
-                                        "it was the age of wisdom, it was the age of foolishness...\n\n"
-                                        "Все счастливые семьи похожи друг на друга, "
-                                        "каждая несчастливая семья несчастлива по-своему.";
+//static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
+//                                        "it was the age of wisdom, it was the age of foolishness...\n\n"
+//                                        "Все счастливые семьи похожи друг на друга, "
+//                                        "каждая несчастливая семья несчастлива по-своему.";
 static vector_float4 MBETextColor = { 0.1, 0.1, 0.1, 1 };
 static MTLClearColor MBEClearColor = { 1, 1, 1, 1 };
 static float MBEFontAtlasSize = 2048;
@@ -95,6 +95,7 @@ MTKMesh *_mesh;
 
 
 
+
 // Old
 //- (instancetype)initWithLayer:(CAMetalLayer *)layer
 //{
@@ -125,6 +126,9 @@ MTKMesh *_mesh;
         //[self _loadMetalWithView:view];
         //[self _loadAssets];
         
+        // Where the hell can we init member vars in ObjC?
+        // Well, here it seems.
+        // See: https://stackoverflow.com/questions/5168633/initialize-instance-variables-on-objective-c/5168766
         _mbeFontName = @"American Typewriter";
         _mbeFontDisplaySize = 72;
         
@@ -134,7 +138,6 @@ MTKMesh *_mesh;
         
         
         // NOTE: the trick is to use a huge font size and scale it down: looks much better.
-        
         _textScale = 1.0;
         _textTranslation = CGPointMake(0, 0);
         
@@ -324,7 +327,7 @@ MTKMesh *_mesh;
         //NSFont *font = [NSFont fontWithName:MBEFontName size:32];
         NSFont *font = [NSFont fontWithName:fontName size:32];
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
-        [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save file
+        [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save .sdff file
     }
 
     MTLTextureDescriptor *textureDesc;
