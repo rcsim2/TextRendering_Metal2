@@ -129,6 +129,7 @@ MTKMesh *_mesh;
         // Where the hell can we init member vars in ObjC?
         // Well, here it seems.
         // See: https://stackoverflow.com/questions/5168633/initialize-instance-variables-on-objective-c/5168766
+        // NOTE: must set these before buildResources
         _mbeFontName = @"American Typewriter";
         _mbeFontDisplaySize = 72;
         
