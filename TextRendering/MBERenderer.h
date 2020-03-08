@@ -17,10 +17,23 @@
 @property (nonatomic, assign) CGPoint textTranslation;
 @property (nonatomic, assign) CGFloat textScale;
 
+
+///////
+@property (nonatomic, assign) NSString * _Nonnull mbeFontName;
+@property (nonatomic, assign) float mbeFontDisplaySize;
+
+
+
 //- (instancetype)initWithLayer:(CAMetalLayer *)layer;
 //- (void)draw;
 
 /////
 -(nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)view;
+
+/////
+// Make these callable from MBEViewController
+-(void)buildFontAtlas:(nonnull NSString*)fontName;
+-(void)buildTextMesh:(nonnull NSString*)text size:(float)fontSize;
+-(void)buildUniformBuffer;
 
 @end

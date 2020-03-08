@@ -27,6 +27,10 @@ MBEMetalView *_view;
 
 //Renderer *_renderer;
 
+// Init
+//NSFont *font;
+
+
 
 - (MBEMetalView *)metalView
 {
@@ -54,6 +58,10 @@ MBEMetalView *_view;
     [_renderer mtkView:_view drawableSizeWillChange:_view.bounds.size];
 
     _view.delegate = _renderer;
+    
+    
+    // Init
+    _font = [NSFont fontWithName:@"American Typewriter" size:72];
     
     
 
@@ -131,6 +139,7 @@ MBEMetalView *_view;
 //    //[self.view addGestureRecognizer:pinchGestureRecognizer];
 }
 
+
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
@@ -147,6 +156,39 @@ MBEMetalView *_view;
 {
     //[self.renderer draw];
 }
+
+
+
+- (void)changeFont:(id)sender {
+    // blah
+//    NSAlert *alert = [[NSAlert alloc] init];
+//    [alert setMessageText:@"Hi there."];
+//    [alert runModal];
+    
+    // See: https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/FontHandling/FontHandling.html
+    NSFont *oldFont = [self font];
+    NSFont *newFont = [sender convertFont:oldFont];
+    [self setFont:newFont];
+    
+//    NSString *str = [NSString stringWithFormat:@"Font: %@\nSize: %f", newFont.fontName, newFont.pointSize];
+//
+//    NSAlert *alert = [[NSAlert alloc] init];
+//    [alert setMessageText:str];
+//    [alert runModal];
+    
+    // rebuild font atlas
+    [_renderer buildFontAtlas:newFont.fontName];
+    [_renderer buildTextMesh:@"MyText" size:newFont.pointSize];
+    [_renderer buildUniformBuffer];
+    
+    
+    
+    return;
+    
+    
+}
+
+
 
 
 

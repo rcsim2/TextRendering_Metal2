@@ -30,8 +30,8 @@
 // * implement gestures as in original
 
 
-static NSString *const MBEFontName = @"American Typewriter";//@"HoeflerText-Regular"; // NOTE: bold italic text looks best
-static float MBEFontDisplaySize = 72; // NOTE: huge size looks better, 72 in the original sample is OK.
+//static NSString *const MBEFontName = @"American Typewriter";//@"HoeflerText-Regular"; // NOTE: bold italic text looks best
+//static float MBEFontDisplaySize = 72; // NOTE: huge size looks better, 72 in the original sample is OK.
 static NSString *const MBESampleText = @"It was the best of times, it was the worst of times, "
                                         "it was the age of wisdom, it was the age of foolishness...\n\n"
                                         "Все счастливые семьи похожи друг на друга, "
@@ -124,8 +124,14 @@ MTKMesh *_mesh;
         //_inFlightSemaphore = dispatch_semaphore_create(kMaxBuffersInFlight);
         //[self _loadMetalWithView:view];
         //[self _loadAssets];
+        
+        _mbeFontName = @"American Typewriter";
+        _mbeFontDisplaySize = 72;
+        
+        
         [self buildMetal];
         [self buildResources];
+        
         
         // NOTE: the trick is to use a huge font size and scale it down: looks much better.
         
@@ -279,8 +285,8 @@ MTKMesh *_mesh;
 
 - (void)buildResources
 {
-    [self buildFontAtlas];
-    [self buildTextMesh:@"MyText"];
+    [self buildFontAtlas:_mbeFontName];
+    [self buildTextMesh:@"MyText" size:_mbeFontDisplaySize];
     [self buildUniformBuffer];
 }
 
@@ -289,25 +295,34 @@ MTKMesh *_mesh;
 
 
 
-- (void)buildFontAtlas
+- (void)buildFontAtlas:(NSString*)fontName
 {
-    NSURL *fontURL = [[self.documentsURL URLByAppendingPathComponent:MBEFontName] URLByAppendingPathExtension:@"sdff"];
+    //NSURL *fontURL = [[self.documentsURL URLByAppendingPathComponent:MBEFontName] URLByAppendingPathExtension:@"sdff"];
+    NSURL *fontURL = [[self.documentsURL URLByAppendingPathComponent:fontName] URLByAppendingPathExtension:@"sdff"];
 
 #if !MBE_FORCE_REGENERATE_FONT_ATLAS
     // How does this work? How can it fill _fontAtlas._textureSize == 2048 ???
     // Not from MBEFontAtlasSize. 2048 must be some standard value.
     // It is getting it from the .sdff (signed-distance field) files that were previously made at:
     // ~/Library/Containers/com.metalbyexample.TextRendering-Metal2/Data/Documents
-    // For testing it is better to regenerate.
+    // by MBEFontAtlas initWithFont here below.
+    // For testing it is better to always regenerate.
     _fontAtlas = [NSKeyedUnarchiver unarchiveObjectWithFile:fontURL.path]; // read file
 #endif
+    
+    // TEST:
+    // TODO: Change buildResources into a version with arguments
+    // This is now only used for printing the font name
+    _mbeFontName = fontName;
 
     // NOTE: Only get here if a .sdff file was not previously made
     // NOTE2: Using size:MBEFontDisplaySize doesn't do much
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
-    if (!_fontAtlas)
+    // TEST:
+    //if (!_fontAtlas) // We change font dynamically so now must always generate font atlas
     {
-        NSFont *font = [NSFont fontWithName:MBEFontName size:32];
+        //NSFont *font = [NSFont fontWithName:MBEFontName size:32];
+        NSFont *font = [NSFont fontWithName:fontName size:32];
         _fontAtlas = [[MBEFontAtlas alloc] initWithFont:font textureSize:MBEFontAtlasSize];
         [NSKeyedArchiver archiveRootObject:_fontAtlas toFile:fontURL.path]; // save file
     }
@@ -372,15 +387,19 @@ MTKMesh *_mesh;
 
 
 // Added text argument so we can call it dynamically
-- (void)buildTextMesh:(NSString*)text
+// Added size argument too
+- (void)buildTextMesh:(NSString*)text size:(float)fontSize
 {
     CGRect textRect = CGRectInset([NSScreen mainScreen].visibleFrame, 40, 0); // RG: text x,y from top left
 
     _textMesh = [[MBETextMesh alloc] initWithString:text //@"QQQ"//MBESampleText
                                              inRect:textRect
                                       withFontAtlas:_fontAtlas
-                                             atSize:MBEFontDisplaySize
+                                             atSize:fontSize //_mbeFontDisplaySize
                                              device:_device];
+    
+    // TODO: better make buildResources with arguments and do this there
+    _mbeFontDisplaySize = fontSize;
 }
 
 
@@ -465,6 +484,16 @@ MTKMesh *_mesh;
 {
     // Yess!!
     // We're in the loop
+    
+    
+    // TEST:
+    // Dynamically change font
+//    if (frame == 1000) {
+//        [self buildFontAtlas:@"Arial"];
+//        [self buildTextMesh:@"MyText"];
+//        [self buildUniformBuffer];
+//    }
+    
     
     
     // Boilerplate
@@ -623,8 +652,8 @@ MTKMesh *_mesh;
             
             // Print FPS onscreen
             //NSString *string1 = [NSString stringWithFormat:@"A string: %@, a float: %1.2f", @"string", 31415.9265];
-            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\nFont: %@\n\n%@", frame, fps, MBEFontName, str3];
-            [self buildTextMesh:str];
+            NSString *str = [NSString stringWithFormat:@"Frame: %i\nFPS: %.1f\nFont: %@\n\n%@", frame, fps, _mbeFontName, str3];
+            [self buildTextMesh:str size:_mbeFontDisplaySize];
             
             
             // SHIT: These font quads are not visible

@@ -16,4 +16,7 @@
 // Pointer to the view's window
 @property (readwrite, nonatomic) NSWindow* window;
 
+// Our font
+@property (readwrite, nonatomic) NSFont* font;
+
 @end
