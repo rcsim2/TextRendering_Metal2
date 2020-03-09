@@ -62,8 +62,8 @@
             filePath = "TextRendering/MBEViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "201"
-            endingLineNumber = "201"
+            startingLineNumber = "203"
+            endingLineNumber = "203"
             landmarkName = "-changeColor:"
             landmarkType = "7">
          </BreakpointContent>

@@ -8,7 +8,7 @@ Hack of https://metalbyexample.com/rendering-text-in-metal-with-signed-distance-
 
 Pure Cocoa (no Mac Catalyst)
 
-![alt text](verkleedfeest2.png "Verkleedfeest")
+![alt text](verkleedfeest4.png "Verkleedfeest")
 
 
 ## References
