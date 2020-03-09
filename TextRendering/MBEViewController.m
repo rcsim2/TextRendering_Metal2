@@ -182,6 +182,13 @@ MBEMetalView *_view;
     [_renderer buildUniformBuffer];
     
     
+    // TEST:
+    // We get here only for the first time user picks a color from the Font Panel's color picker but do
+    // not get the color this way. 
+    NSColor *newColor = [sender color];
+    _renderer.mbeTextColor = simd_make_float4( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
+
+    
     
     return;
     
