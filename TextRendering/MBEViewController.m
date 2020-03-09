@@ -189,6 +189,15 @@ MBEMetalView *_view;
 }
 
 
+- (void)changeColor:(id)sender {
+    // YESS: Works!
+    // TODO: make text color changes also work from the Font Panel color picker
+    // TODO: also background color change.
+    NSColor *newColor = [sender color];
+    _renderer.mbeTextColor = simd_make_float4( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
+}
+
+
 
 
 

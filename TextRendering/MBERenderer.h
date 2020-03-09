@@ -23,6 +23,8 @@
 @property (nonatomic, assign) NSString * _Nonnull mbeFontName;
 @property (nonatomic, assign) float               mbeFontDisplaySize;
 
+@property (nonatomic, assign) vector_float4 mbeTextColor;
+
 
 
 //- (instancetype)initWithLayer:(CAMetalLayer *)layer;

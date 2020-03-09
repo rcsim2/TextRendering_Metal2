@@ -19,7 +19,7 @@
 
 
 
-#define MBE_FORCE_REGENERATE_FONT_ATLAS 1//0
+#define MBE_FORCE_REGENERATE_FONT_ATLAS 0
 
 // NOTE: try different combinations of fonts and sizes and scale; one size smaller or bigger gets rid of glyph
 // TODO:
@@ -36,7 +36,7 @@
 //                                        "it was the age of wisdom, it was the age of foolishness...\n\n"
 //                                        "Все счастливые семьи похожи друг на друга, "
 //                                        "каждая несчастливая семья несчастлива по-своему.";
-static vector_float4 MBETextColor = { 0.1, 0.1, 0.1, 1 };
+//static vector_float4 MBETextColor = { 0.1, 0.1, 0.1, 1 };
 static MTLClearColor MBEClearColor = { 1, 1, 1, 1 };
 static float MBEFontAtlasSize = 2048;
 
@@ -132,6 +132,8 @@ MTKMesh *_mesh;
         // NOTE: must set these before buildResources
         _mbeFontName = @"American Typewriter";
         _mbeFontDisplaySize = 72;
+        
+        _mbeTextColor = simd_make_float4( 0.1, 0.1, 0.1, 1 );
         
         
         [self buildMetal];
@@ -323,7 +325,7 @@ MTKMesh *_mesh;
     // NOTE2: Using size:MBEFontDisplaySize doesn't do much
     // Cache miss: if we don't have a serialized version of the font atlas, build it now
     // TEST:
-    //if (!_fontAtlas) // We change font dynamically so now must always generate font atlas
+    if (!_fontAtlas) // We change font dynamically so now must always generate font atlas
     {
         //NSFont *font = [NSFont fontWithName:MBEFontName size:32];
         NSFont *font = [NSFont fontWithName:fontName size:32];
@@ -475,7 +477,7 @@ MTKMesh *_mesh;
     matrix_float4x4 projectionMatrix = matrix_orthographic_projection(0, drawableSize.width, 0, drawableSize.height);
     uniforms.viewProjectionMatrix = projectionMatrix;
 
-    uniforms.foregroundColor = MBETextColor;
+    uniforms.foregroundColor = _mbeTextColor;
 
     memcpy([self.uniformBuffer contents], &uniforms, sizeof(MBEUniforms));
 }
