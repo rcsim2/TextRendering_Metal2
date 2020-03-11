@@ -159,11 +159,15 @@ MBEMetalView *_view;
 
 
 
-- (void)changeFont:(id)sender {
+
+
+
+- (void)changeFont:(id)sender { // deprecated but works
     // blah
 //    NSAlert *alert = [[NSAlert alloc] init];
 //    [alert setMessageText:@"Hi there."];
 //    [alert runModal];
+    
     
     // See: https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/FontHandling/FontHandling.html
     NSFont *oldFont = [self font];
@@ -183,11 +187,17 @@ MBEMetalView *_view;
     
     
     // TEST:
-    // We get here only for the first time user picks a color from the Font Panel's color picker but do
+    // We get here only for the first time user picks a color from the Font Panel's T button color picker but do
     // not get the color this way. 
-    NSColor *newColor = [sender color];
-    _renderer.mbeTextColor = simd_make_float4( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
+    //NSColor *newColor = [sender color];
+    //_renderer.mbeTextColor = simd_make_float4( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
 
+    // NOTE: the font panel has three color pickers:
+    // cogwheel -> color for text (works)
+    // T for text (does not work)
+    // / for background (works)
+    // how can we access when user picks the T button?
+    // See: NSFontPanelTextColorEffectModeMask and NSFontPanelModeMaskDocumentColorEffect
     
     
     return;
@@ -196,12 +206,33 @@ MBEMetalView *_view;
 }
 
 
+
+
 - (void)changeColor:(id)sender {
-    // YESS: Works!
-    // TODO: make text color changes also work from the Font Panel color picker
-    // TODO: also background color change.
+    // HELL: This works from Font->Show Colors menu, also from Cogwheel->Color but not From T Button Colorpicker.
+    // Also when picking from T button then Cogwheel no longer works.
+    // This API is such a major pain.
+    // TODO: make text color changes also work from the Font Panel T button color picker
     NSColor *newColor = [sender color];
     _renderer.mbeTextColor = simd_make_float4( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
+}
+
+
+-(void)changeDocumentBackgroundColor:(id)sender {
+    //[self setBackgroundColor:[sender color]];
+    NSColor *newColor = [sender color];
+    _renderer.mbeClearColor = MTLClearColorMake( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
+}
+
+
+
+// See: https://cocoadev.github.io/NSFontPanel/
+// Allow the font panel to set the underline, strikethrough and shadow attributes.
+// Why is this not in the docs??? Cocoa sucks.
+-(void)changeAttributes:(id)sender {
+    //NSDictionary *oldAttributes = [self fontAttributes];
+    //NSDictionary *newAttributes = [sender convertAttributes: oldAttributes];
+    //[self setFontAttributes:newAttributes]; return;
 }
 
 

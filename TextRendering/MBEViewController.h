@@ -19,7 +19,8 @@
 // Our font
 @property (readwrite, nonatomic) NSFont* font;
 
-// Our color
-@property (readwrite, nonatomic) NSColor* color;
+// Our colors
+//@property (readwrite, nonatomic) NSColor* colorText;
+//@property (readwrite, nonatomic) NSColor* colorClear;
 
 @end

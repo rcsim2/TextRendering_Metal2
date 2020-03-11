@@ -37,7 +37,7 @@
 //                                        "Все счастливые семьи похожи друг на друга, "
 //                                        "каждая несчастливая семья несчастлива по-своему.";
 //static vector_float4 MBETextColor = { 0.1, 0.1, 0.1, 1 };
-static MTLClearColor MBEClearColor = { 1, 1, 1, 1 };
+//static MTLClearColor MBEClearColor = { 1, 1, 1, 1 };
 static float MBEFontAtlasSize = 2048;
 
 
@@ -134,6 +134,7 @@ MTKMesh *_mesh;
         _mbeFontDisplaySize = 72;
         
         _mbeTextColor = simd_make_float4( 0.1, 0.1, 0.1, 1 );
+        _mbeClearColor = MTLClearColorMake( 1.0, 1.0, 1.0, 1 );
         
         
         [self buildMetal];
@@ -563,7 +564,7 @@ MTKMesh *_mesh;
         //renderPass.colorAttachments[0].texture = _fontTexture;// _fontTexture
         renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
         renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
-        renderPass.colorAttachments[0].clearColor = MBEClearColor;
+        renderPass.colorAttachments[0].clearColor = _mbeClearColor;
 
         renderPass.depthAttachment.texture = self.depthTexture; // the depth texture
         renderPass.depthAttachment.loadAction = MTLLoadActionClear;
