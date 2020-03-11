@@ -200,15 +200,28 @@ MBEMetalView *_view;
     // how can we access when user picks the T button?
     // See: NSFontPanelTextColorEffectModeMask and NSFontPanelModeMaskDocumentColorEffect
     
-    
     return;
-    
     
 }
 
 
+// YESS: Works!!
+// But where is it in the fucking docs???
+// FUCK: now background no longer works probably because this is overriding changeDocumentBackgroundColor
+- (void)setColor:(NSColor *)col forAttribute:(NSString *)attr {
+    if ([attr isEqualToString:@"NSDocumentBackgroundColor"]) {
+        //self.airportTableView.backgroundColor = col;
+        _renderer.mbeClearColor = MTLClearColorMake( col.redComponent, col.greenComponent, col.blueComponent, col.alphaComponent );
+    } else if ([attr isEqualToString:@"NSColor"]) {
+        //_fontColor  = col;
+        //[self.airportTableView reloadData];
+        _renderer.mbeTextColor = simd_make_float4( col.redComponent, col.greenComponent, col.blueComponent, col.alphaComponent );
+    }
+}
 
 
+
+// Deprecated
 - (void)changeColor:(id)sender {
     // HELL: This works from Font->Show Colors menu, also from Cogwheel->Color but not From T Button Colorpicker.
     // Also when picking from T button then Cogwheel no longer works.
@@ -224,6 +237,8 @@ MBEMetalView *_view;
     NSColor *newColor = [sender color];
     _renderer.mbeClearColor = MTLClearColorMake( newColor.redComponent, newColor.greenComponent, newColor.blueComponent, newColor.alphaComponent );
 }
+
+
 
 
 
