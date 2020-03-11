@@ -164,12 +164,16 @@ MBEMetalView *_view;
 ///////////////
 // We can use this to get a font panel that has the font correctly selected the first time it shows
 // TODO: colors work, but not font change
+// DONE
 // TODO: get this in ViewController
 // DONE: must connect menu item with ViewController's first responder and then select showFonts2
+// TODO: use a variable
+// DONE
 - (IBAction)showFonts2:(id)sender {
     NSFontManager * fontManager = [NSFontManager sharedFontManager];
     [fontManager setTarget:self];
-    [fontManager setSelectedFont:[NSFont fontWithName:@"American Typewriter" size:72.0] isMultiple:NO];
+    //[fontManager setSelectedFont:[NSFont fontWithName:@"American Typewriter" size:72.0] isMultiple:NO];
+    [fontManager setSelectedFont:_font isMultiple:NO];
     [fontManager orderFrontFontPanel:self];
 }
 
