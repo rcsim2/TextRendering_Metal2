@@ -23,4 +23,6 @@
 //@property (readwrite, nonatomic) NSColor* colorText;
 //@property (readwrite, nonatomic) NSColor* colorClear;
 
+- (IBAction)showFonts2:(id)sender;
+
 @end

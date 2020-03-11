@@ -161,6 +161,21 @@ MBEMetalView *_view;
 
 
 
+///////////////
+// We can use this to get a font panel that has the font correctly selected the first time it shows
+// TODO: colors work, but not font change
+// TODO: get this in ViewController
+// DONE: must connect menu item with ViewController's first responder and then select showFonts2
+- (IBAction)showFonts2:(id)sender {
+    NSFontManager * fontManager = [NSFontManager sharedFontManager];
+    [fontManager setTarget:self];
+    [fontManager setSelectedFont:[NSFont fontWithName:@"American Typewriter" size:72.0] isMultiple:NO];
+    [fontManager orderFrontFontPanel:self];
+}
+
+
+
+
 
 - (void)changeFont:(id)sender { // deprecated but works
     // blah
@@ -206,8 +221,13 @@ MBEMetalView *_view;
 
 
 // YESS: Works!!
-// But where is it in the fucking docs???
+// But where is it in the fucking docs??? Do we really have to get this from an obscure old stackoverflow post?
+// Should be in the docs loud and clear. With examples.
 // FUCK: now background no longer works probably because this is overriding changeDocumentBackgroundColor
+// DONE: set background here too.
+// NOTE: clicking background button does not work the first time. Need to reclick twice. Why?
+// It is because the first click changeFont and then setColor are called. Why? Bug???
+// Why is this called when we only click the button? This API sucks big time.
 - (void)setColor:(NSColor *)col forAttribute:(NSString *)attr {
     if ([attr isEqualToString:@"NSDocumentBackgroundColor"]) {
         //self.airportTableView.backgroundColor = col;
@@ -221,7 +241,7 @@ MBEMetalView *_view;
 
 
 
-// Deprecated
+// Deprecated? May be but Font->Show Colors menu, and Cogwheel->Color need it. Crappy docs again.
 - (void)changeColor:(id)sender {
     // HELL: This works from Font->Show Colors menu, also from Cogwheel->Color but not From T Button Colorpicker.
     // Also when picking from T button then Cogwheel no longer works.
@@ -232,6 +252,7 @@ MBEMetalView *_view;
 }
 
 
+// This is now no longer called
 -(void)changeDocumentBackgroundColor:(id)sender {
     //[self setBackgroundColor:[sender color]];
     NSColor *newColor = [sender color];
